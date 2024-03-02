@@ -9,6 +9,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 "6.6" REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(PortAudio REQUIRED portaudiocpp IMPORTED_TARGET)
 
 set(EXE_NAME pmidi)
 
@@ -32,9 +35,7 @@ PRIVATE
     libs/tsf.h
     libs/tml.h
     libs/stb_vorbis.c
-    libs/minisdl_audio.c
-    libs/minisdl_audio.h
 )
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)
-target_link_libraries(${EXE_NAME} PRIVATE Qt::Widgets -lwinmm -lws2_32)
+target_link_libraries(${EXE_NAME} PRIVATE Qt::Widgets PkgConfig::PortAudio)

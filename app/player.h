@@ -4,9 +4,15 @@
 #include <variant>
 #include <functional>
 
-#include "minisdl_audio.h"
 #include "tsf.h"
 #include "tml.h"
+
+namespace portaudio {
+template<typename T>
+class MemFunCallbackStream;
+}
+struct PaStreamCallbackTimeInfo;
+typedef unsigned long PaStreamCallbackFlags;
 
 class Player
 {
@@ -37,13 +43,16 @@ public:
 
 private:
     Player();
+    ~Player();
 
     static Player * m_player_instance;
-    void sdl_audioCallback(void* data, uint8_t *stream, int len);
+    int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames,
+                       const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
 
     float m_volume = 1;
+    bool m_isPlaying = false;
 
-    SDL_AudioSpec m_sdlOutputAudioSpec;
+    portaudio::MemFunCallbackStream<Player> * m_stream;
     tml_message* m_tinyMidiLoader = NULL;
     tsf* m_tinySoundFont = NULL;
     tml_message* m_currentPlaybackMessagePos;
