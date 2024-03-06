@@ -40,9 +40,6 @@ MainWindow::MainWindow(QWidget *parent)
         ui->soundFontFileLabel->setText(fi.fileName());
         m_currentSf2FilePath = path;
     });
-
-    // loadMidiFile(R"(I:\AA1\TAT\BGM118.mid)");
-    // Player::instance()->play();
 }
 
 MainWindow::~MainWindow()
@@ -230,7 +227,6 @@ bool MainWindow::scanSoundfonts()
 
 void MainWindow::playerPlaybackCallback(unsigned int curMs)
 {
-    qDebug() << curMs;
     ui->seekSlider->setValue(curMs);
 }
 

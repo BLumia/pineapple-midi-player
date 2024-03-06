@@ -38,4 +38,4 @@ PRIVATE
 )
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)
-target_link_libraries(${EXE_NAME} PRIVATE Qt::Widgets PkgConfig::PortAudio)
+target_link_libraries(${EXE_NAME} PRIVATE Qt6::Widgets PkgConfig::PortAudio)
