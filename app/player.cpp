@@ -3,12 +3,13 @@
 #include <cstdint>
 #include <portaudiocpp/PortAudioCpp.hxx>
 
-#define STB_VORBIS_HEADER_ONLY
-#include "stb_vorbis.c"
-#define TSF_IMPLEMENTATION
 #include "tsf.h"
-#define TML_IMPLEMENTATION
 #include "tml.h"
+#include "dr_wav.h"
+
+#ifndef TSF_RENDER_EFFECTSAMPLEBLOCK
+#define TSF_RENDER_EFFECTSAMPLEBLOCK 64
+#endif
 
 constexpr std::int32_t SAMPLE_RATE = 44100;
 
@@ -118,6 +119,39 @@ bool Player::loadSF2File(const char *sf2Path)
     return true;
 }
 
+#include <iostream>
+bool Player::renderToWav(const char *filePath)
+{
+    drwav_data_format format;
+    drwav wav;
+
+    format.container     = drwav_container_riff;
+    format.format        = DR_WAVE_FORMAT_IEEE_FLOAT;
+    format.channels      = 2;
+    format.sampleRate    = SAMPLE_RATE;
+    format.bitsPerSample = 32;
+
+    if (!drwav_init_file_write(&wav, filePath, &format, NULL)) {
+        printf("Failed to open file.\n");
+        return false;
+    }
+
+    auto info = midiInfo();
+    const unsigned int durationMs = std::get<unsigned int>(info[Player::I_LENGTH_MS]);
+
+    float buffer[TSF_RENDER_EFFECTSAMPLEBLOCK * 2 * sizeof(float)];
+
+    tml_message * curMsg = m_tinyMidiLoader;
+    double curMs = 0;
+    while (curMs <= durationMs) {
+        std::tie(curMs, curMsg) = renderToBuffer((float *)buffer, curMsg, curMs, TSF_RENDER_EFFECTSAMPLEBLOCK);
+        drwav_write_pcm_frames(&wav, TSF_RENDER_EFFECTSAMPLEBLOCK, buffer);
+    }
+
+    drwav_uninit(&wav);
+    return true;
+}
+
 void Player::setPlaybackCallback(std::function<void (unsigned int)> cb)
 {
     mf_playbackCallback = cb;
@@ -146,6 +180,38 @@ Player::~Player()
     m_stream->stop();
 }
 
+std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_message *startMsg, double startMs, int sampleCount)
+{
+    const double playbackEnd = startMs + (sampleCount * (1000.0 / SAMPLE_RATE));
+    double curMs = startMs;
+    tml_message * curMsg = startMsg;
+
+    for (; curMsg && curMs >= curMsg->time; curMsg = curMsg->next) {
+        switch (curMsg->type) {
+        case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
+            tsf_channel_set_presetnumber(m_tinySoundFont, curMsg->channel, curMsg->program, (curMsg->channel == 9));
+            break;
+        case TML_NOTE_ON: //play a note
+            tsf_channel_note_on(m_tinySoundFont, curMsg->channel, curMsg->key, curMsg->velocity / 127.0f);
+            break;
+        case TML_NOTE_OFF: //stop a note
+            tsf_channel_note_off(m_tinySoundFont, curMsg->channel, curMsg->key);
+            break;
+        case TML_PITCH_BEND: //pitch wheel modification
+            tsf_channel_set_pitchwheel(m_tinySoundFont, curMsg->channel, curMsg->pitch_bend);
+            break;
+        case TML_CONTROL_CHANGE: //MIDI controller messages
+            tsf_channel_midi_control(m_tinySoundFont, curMsg->channel, curMsg->control, curMsg->control_value);
+            break;
+        }
+    }
+
+    // Render the block of audio samples in float format
+    tsf_render_float(m_tinySoundFont, buffer, sampleCount, 0);
+
+    return std::make_tuple(playbackEnd, curMsg);
+}
+
 int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames,
                            const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags)
 {
@@ -168,32 +234,8 @@ int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned
             //We progress the MIDI playback and then process TSF_RENDER_EFFECTSAMPLEBLOCK samples at once
             if (SampleBlock > SampleCount) SampleBlock = SampleCount;
 
-            //Loop through all MIDI messages which need to be played up until the current playback time
-            for (m_currentPlaybackMSec += SampleBlock * (1000.0 / 44100.0);
-                 m_currentPlaybackMessagePos && m_currentPlaybackMSec >= m_currentPlaybackMessagePos->time;
-                 m_currentPlaybackMessagePos = m_currentPlaybackMessagePos->next)
-            {
-                switch (m_currentPlaybackMessagePos->type) {
-                case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
-                    tsf_channel_set_presetnumber(m_tinySoundFont, m_currentPlaybackMessagePos->channel, m_currentPlaybackMessagePos->program, (m_currentPlaybackMessagePos->channel == 9));
-                    break;
-                case TML_NOTE_ON: //play a note
-                    tsf_channel_note_on(m_tinySoundFont, m_currentPlaybackMessagePos->channel, m_currentPlaybackMessagePos->key, m_currentPlaybackMessagePos->velocity / 127.0f);
-                    break;
-                case TML_NOTE_OFF: //stop a note
-                    tsf_channel_note_off(m_tinySoundFont, m_currentPlaybackMessagePos->channel, m_currentPlaybackMessagePos->key);
-                    break;
-                case TML_PITCH_BEND: //pitch wheel modification
-                    tsf_channel_set_pitchwheel(m_tinySoundFont, m_currentPlaybackMessagePos->channel, m_currentPlaybackMessagePos->pitch_bend);
-                    break;
-                case TML_CONTROL_CHANGE: //MIDI controller messages
-                    tsf_channel_midi_control(m_tinySoundFont, m_currentPlaybackMessagePos->channel, m_currentPlaybackMessagePos->control, m_currentPlaybackMessagePos->control_value);
-                    break;
-                }
-            }
-
-            // Render the block of audio samples in float format
-            tsf_render_float(m_tinySoundFont, (float*)buffer, SampleBlock, 0);
+            std::tie(m_currentPlaybackMSec, m_currentPlaybackMessagePos)
+                = renderToBuffer((float*)buffer, m_currentPlaybackMessagePos, m_currentPlaybackMSec, SampleBlock);
         }
 
         if (mf_playbackCallback) {

@@ -43,6 +43,8 @@ private slots:
 
     void on_actionAbout_triggered();
 
+    void on_renderBtn_clicked();
+
 private:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;

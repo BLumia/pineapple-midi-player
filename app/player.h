@@ -39,11 +39,15 @@ public:
     bool loadMidiFile(const char * filePath);
     bool loadSF2File(const char * sf2Path);
 
+    bool renderToWav(const char * filePath);
+
     void setPlaybackCallback(std::function<void(unsigned int)> cb);
 
 private:
     Player();
     ~Player();
+
+    std::tuple<double, tml_message *> renderToBuffer(float * buffer, tml_message * startMsg, double startMs, int sampleCount);
 
     static Player * m_player_instance;
     int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames,

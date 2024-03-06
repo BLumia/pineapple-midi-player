@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>636</width>
-    <height>222</height>
+    <height>201</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -40,6 +40,27 @@
      </widget>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="curTimeLabel">
+        <property name="text">
+         <string>0:00</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="durationLabel">
+        <property name="text">
+         <string>0:00</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QSlider" name="seekSlider">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -59,6 +80,13 @@
        <widget class="QPushButton" name="stopBtn">
         <property name="text">
          <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="renderBtn">
+        <property name="text">
+         <string>Convert to Wav</string>
         </property>
        </widget>
       </item>

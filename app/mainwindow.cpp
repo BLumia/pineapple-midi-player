@@ -32,7 +32,9 @@ MainWindow::MainWindow(QWidget *parent)
         m_currentMidiFilePath = path;
 
         auto info = Player::instance()->midiInfo();
-        ui->seekSlider->setMaximum(std::get<unsigned int>(info[Player::I_LENGTH_MS]));
+        unsigned int duration = std::get<unsigned int>(info[Player::I_LENGTH_MS]);
+        ui->seekSlider->setMaximum(duration);
+        ui->durationLabel->setText(QTime::fromMSecsSinceStartOfDay(0).addMSecs(duration).toString("m:ss").toLatin1().data());
     });
 
     connect(this, &MainWindow::soundfontLoaded, this, [this](const QString path){
@@ -228,6 +230,7 @@ bool MainWindow::scanSoundfonts()
 void MainWindow::playerPlaybackCallback(unsigned int curMs)
 {
     ui->seekSlider->setValue(curMs);
+    ui->curTimeLabel->setText(QTime::fromMSecsSinceStartOfDay(0).addMSecs(curMs).toString("m:ss").toLatin1().data());
 }
 
 
@@ -280,5 +283,15 @@ void MainWindow::on_actionAbout_triggered()
     );
     infoBox.setTextFormat(Qt::MarkdownText);
     infoBox.exec();
+}
+
+void MainWindow::on_renderBtn_clicked()
+{
+    Player::instance()->stop();
+
+    QString path = QFileDialog::getSaveFileName(this, "Render to...", QStandardPaths::writableLocation(QStandardPaths::MusicLocation), "Wave File (*.wav)");
+    if (path.isEmpty()) return;
+
+    Player::instance()->renderToWav(QFile::encodeName(path));
 }
 

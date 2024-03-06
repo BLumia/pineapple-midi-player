@@ -34,7 +34,9 @@ PRIVATE
     # vendored libs
     libs/tsf.h
     libs/tml.h
+    libs/dr_wav.h
     libs/stb_vorbis.c
+    libs/implements.c
 )
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)
