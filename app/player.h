@@ -7,13 +7,7 @@
 #include "tsf.h"
 #include "tml.h"
 
-namespace portaudio {
-template<typename T>
-class MemFunCallbackStream;
-}
-struct PaStreamCallbackTimeInfo;
-typedef unsigned long PaStreamCallbackFlags;
-
+typedef void PaStream;
 class Player
 {
 public:
@@ -51,13 +45,12 @@ private:
     std::tuple<double, tml_message *> renderToBuffer(float * buffer, tml_message * startMsg, double startMs, int sampleCount);
 
     static Player * m_player_instance;
-    int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames,
-                       const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
+    int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames);
 
     float m_volume = 1;
     bool m_isPlaying = false;
 
-    portaudio::MemFunCallbackStream<Player> * m_stream;
+    PaStream * m_stream;
     tml_message* m_tinyMidiLoader = NULL;
     tsf* m_tinySoundFont = NULL;
     tml_message* m_currentPlaybackMessagePos;

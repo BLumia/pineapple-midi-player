@@ -1,7 +1,9 @@
 #include "player.h"
 
+#include <cstdio>
 #include <cstdint>
-#include <portaudiocpp/PortAudioCpp.hxx>
+
+#include <portaudio.h>
 
 #include "tsf.h"
 #include "tml.h"
@@ -166,25 +168,20 @@ void Player::onIsPlayingChanged(std::function<void (bool)> cb)
 
 Player::Player()
 {
-    portaudio::AutoSystem pa_initializer;
-    pa_initializer.initialize();
-    portaudio::System & pa = portaudio::System::instance();
-    portaudio::Device & outputDevice = pa.defaultOutputDevice();
-    portaudio::DirectionSpecificStreamParameters inputParams(
-        portaudio::DirectionSpecificStreamParameters::null());
-    portaudio::DirectionSpecificStreamParameters outputParams(
-        outputDevice, 2, portaudio::FLOAT32, true,
-        outputDevice.defaultHighOutputLatency(), 0);
-    portaudio::StreamParameters stream_params(
-        inputParams, outputParams,
-        SAMPLE_RATE, paFramesPerBufferUnspecified, paNoFlag);
-    m_stream = new portaudio::MemFunCallbackStream<Player>(stream_params, *this, &Player::streamCallback);
-    m_stream->start();
+    PaError err;
+    Pa_Initialize();
+    Pa_OpenDefaultStream(&m_stream, 0, 2, paFloat32, SAMPLE_RATE, paFramesPerBufferUnspecified,
+        +[](const void *inputBuffer, void *outputBuffer,
+            unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
+            PaStreamCallbackFlags statusFlags, void *userData) -> int {
+                return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
+        }, this);
+    Pa_StartStream(m_stream);
 }
 
 Player::~Player()
 {
-    m_stream->stop();
+    Pa_StopStream(m_stream);
 }
 
 std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_message *startMsg, double startMs, int sampleCount)
@@ -219,8 +216,7 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
     return std::make_tuple(playbackEnd, curMsg);
 }
 
-int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames,
-                           const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags)
+int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames)
 {
     if (m_tinyMidiLoader && m_tinySoundFont && m_isPlaying) {
         std::uint8_t * buffer = (std::uint8_t *)outputBuffer;
@@ -249,7 +245,6 @@ int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned
             mf_playbackCallback(m_currentPlaybackMSec);
         }
 
-        // Loop
         if (!m_currentPlaybackMessagePos) {
             m_currentPlaybackMSec = 0;
             m_currentPlaybackMessagePos = m_tinyMidiLoader;

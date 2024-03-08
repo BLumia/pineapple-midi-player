@@ -9,13 +9,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 "6.6" REQUIRED COMPONENTS Widgets LinguistTools)
-find_package(PkgConfig REQUIRED)
+find_package(PortAudio REQUIRED)
 
-pkg_check_modules(PortAudio REQUIRED portaudiocpp IMPORTED_TARGET)
+if(NOT TARGET PortAudio::PortAudio AND TARGET portaudio)
+    # the current latest released tag (19.7.0) doesn't provide the PortAudio::portaudio target
+    add_library(PortAudio::PortAudio ALIAS portaudio)
+endif()
 
 set(EXE_NAME pmidi)
 
-add_executable(${EXE_NAME})
+add_executable(${EXE_NAME} WIN32)
 
 qt_add_resources(${EXE_NAME} resources.qrc
     PREFIX "/icons"
@@ -40,4 +43,4 @@ PRIVATE
 )
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)
-target_link_libraries(${EXE_NAME} PRIVATE Qt6::Widgets PkgConfig::PortAudio)
+target_link_libraries(${EXE_NAME} PRIVATE Qt6::Widgets PortAudio::PortAudio)
