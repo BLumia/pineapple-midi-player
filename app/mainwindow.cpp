@@ -25,6 +25,10 @@ MainWindow::MainWindow(QWidget *parent)
     scanSoundfonts();
 
     Player::instance()->setPlaybackCallback(std::bind(&MainWindow::playerPlaybackCallback, this, std::placeholders::_1));
+    Player::instance()->onIsPlayingChanged([this](bool isPlaying){
+        ui->playBtn->setText(isPlaying ? QCoreApplication::translate("MainWindow", "Pause")
+                                       : QCoreApplication::translate("MainWindow", "Play"));
+    });
 
     connect(this, &MainWindow::midiFileLoaded, this, [this](const QString path){
         QFileInfo fi(path);

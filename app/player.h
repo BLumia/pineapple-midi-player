@@ -42,6 +42,7 @@ public:
     bool renderToWav(const char * filePath);
 
     void setPlaybackCallback(std::function<void(unsigned int)> cb);
+    void onIsPlayingChanged(std::function<void(bool)> cb);
 
 private:
     Player();
@@ -64,4 +65,5 @@ private:
     tml_message* m_seekToMessagePos = NULL;
     double m_seekToMSec = 0;
     std::function<void(unsigned int)> mf_playbackCallback;
+    std::function<void(bool)> mf_onIsPlayingChanged;
 };

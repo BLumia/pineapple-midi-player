@@ -27,11 +27,13 @@ Player * Player::instance()
 void Player::play()
 {
     m_isPlaying = true;
+    if (mf_onIsPlayingChanged) mf_onIsPlayingChanged(m_isPlaying);
 }
 
 void Player::pause()
 {
     m_isPlaying = false;
+    if (mf_onIsPlayingChanged) mf_onIsPlayingChanged(m_isPlaying);
 }
 
 void Player::stop()
@@ -155,6 +157,11 @@ bool Player::renderToWav(const char *filePath)
 void Player::setPlaybackCallback(std::function<void (unsigned int)> cb)
 {
     mf_playbackCallback = cb;
+}
+
+void Player::onIsPlayingChanged(std::function<void (bool)> cb)
+{
+    mf_onIsPlayingChanged = cb;
 }
 
 Player::Player()
