@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    delete Player::instance(); // the callback might call UI thread, so delete it first
     delete ui;
 }
 
@@ -84,16 +85,27 @@ void MainWindow::loadSoundFontFile(const QString &path)
     }
 }
 
+void MainWindow::loadOP2File(const QString &path)
+{
+    if (QFileInfo::exists(path)) {
+        bool succ = Player::instance()->loadOP2File(QFile::encodeName(path));
+        qDebug() << "op2 file:" << path << succ;
+    }
+}
+
 void MainWindow::tryLoadFiles(const QList<QUrl> &urls, bool tryPlayAfterLoad, bool suppressWarningDlg)
 {
     const QStringList soundfontFormats{"sf2", "sf3"};
 
     for (const QUrl & url : urls) {
         QFileInfo fi(url.toLocalFile());
-        if (fi.suffix().toLower() == "mid") {
+        QString suffix(fi.suffix().toLower());
+        if (suffix == "mid") {
             loadMidiFile(fi.absoluteFilePath());
         } else if (soundfontFormats.contains(fi.suffix().toLower())) {
             loadSoundFontFile(fi.absoluteFilePath());
+        } else if (suffix == "op2") {
+            loadOP2File(fi.absoluteFilePath());
         }
     }
 
@@ -111,13 +123,26 @@ bool MainWindow::checkCanPlay(bool suppressWarningDlg)
 
     if (!ensureWeHaveSoundfont()) {
         if (!suppressWarningDlg) {
+            m_noSoundFontInfoBoxShownTimesCount++;
+
             QMessageBox infoBox(this);
+
+            QString helpText = tr("You need to select a SoundFont before play the MIDI file.");
+            if (m_noSoundFontInfoBoxShownTimesCount >= 3) {
+                helpText += QString("\n\n") + tr("You have seen this dialog for %1 times, if you really don't want to use a SoundFont, you can now ignore this warning if you want.").arg(m_noSoundFontInfoBoxShownTimesCount);
+                infoBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Ignore);
+            }
+
             infoBox.setIcon(QMessageBox::Information);
             infoBox.setWindowTitle("Missing SoundFont");
-            infoBox.setInformativeText("If you don't know where to get, check out <a href='https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list'>this page</a> provided by MuseScore.");
-            infoBox.setText("You need to select a SoundFont before play the MIDI file.");
+            infoBox.setInformativeText("If you don't know where to get a SoundFont, check out <a href='https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list'>this page</a> provided by MuseScore.");
+            infoBox.setText(helpText);
             infoBox.setTextFormat(Qt::MarkdownText);
             infoBox.exec();
+            if (infoBox.result() == QMessageBox::Ignore) {
+                // easter egg: will use the opl engine to do the playback.
+                return true;
+            }
         }
         return false;
     }
@@ -147,8 +172,7 @@ QList<QUrl> MainWindow::convertToUrlList(const QStringList &files)
 
 void MainWindow::on_playBtn_clicked()
 {
-    if (!checkCanPlay(false)) return;
-    Player::instance()->isPlaying() ? Player::instance()->pause() : Player::instance()->play();
+    Player::instance()->isPlaying() ? Player::instance()->pause() : tryPlay(false);
 }
 
 void MainWindow::on_stopBtn_clicked()

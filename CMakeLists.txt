@@ -37,6 +37,7 @@ PRIVATE
     # vendored libs
     libs/tsf.h
     libs/tml.h
+    libs/opl.h
     libs/dr_wav.h
     libs/stb_vorbis.c
     libs/implements.c

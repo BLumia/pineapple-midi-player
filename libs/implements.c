@@ -15,3 +15,8 @@
 // only required by the wav file renderer part
 #define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
+// https://github.com/mattiasgustavsson/dos-like
+// revision: a15e72402c99ed507ef48a5efebb390cc4c2dd65
+// maybe this can become an easter egg ;p
+#define OPL_IMPLEMENTATION
+#include "opl.h"

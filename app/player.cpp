@@ -2,9 +2,12 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <iostream>
+#include <fstream>
 
 #include <portaudio.h>
 
+#include "opl.h"
 #include "tsf.h"
 #include "tml.h"
 #include "dr_wav.h"
@@ -41,6 +44,8 @@ void Player::pause()
 void Player::stop()
 {
     pause();
+
+    opl_clear(m_opl);
     if (m_tinySoundFont != NULL) tsf_note_off_all(m_tinySoundFont);
     m_currentPlaybackMSec = 0;
     if (m_tinyMidiLoader != NULL) m_currentPlaybackMessagePos = m_tinyMidiLoader;
@@ -53,8 +58,9 @@ bool Player::isPlaying() const
 
 void Player::seekTo(unsigned int ms)
 {
-    if (m_tinySoundFont && m_tinyMidiLoader) {
-        tsf_note_off_all(m_tinySoundFont);
+    if (m_tinyMidiLoader) {
+        opl_clear(m_opl);
+        if (m_tinySoundFont) tsf_note_off_all(m_tinySoundFont);
         m_seekToMSec = ms;
         tml_message* search = m_tinyMidiLoader;
         while (search->next) {
@@ -139,7 +145,18 @@ bool Player::loadSF2File(const char *sf2Path)
     return true;
 }
 
-#include <iostream>
+bool Player::loadOP2File(const char *op2Path)
+{
+    std::ifstream file(op2Path, std::ios::binary | std::ios::ate);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    char * fileBuffer = new char[size];
+    file.read(fileBuffer, size);
+    int ret = opl_loadbank_op2(m_opl, fileBuffer, size);
+    free(fileBuffer);
+    return ret == 0;
+}
+
 bool Player::renderToWav(const char *filePath)
 {
     drwav_data_format format;
@@ -184,7 +201,8 @@ void Player::onIsPlayingChanged(std::function<void (bool)> cb)
 
 Player::Player()
 {
-    PaError err;
+    m_opl = opl_create();
+
     Pa_Initialize();
     Pa_OpenDefaultStream(&m_stream, 0, 2, paFloat32, SAMPLE_RATE, paFramesPerBufferUnspecified,
         +[](const void *inputBuffer, void *outputBuffer,
@@ -198,10 +216,53 @@ Player::Player()
 Player::~Player()
 {
     Pa_StopStream(m_stream);
+
+    opl_destroy(m_opl);
+}
+
+std::tuple<double, tml_message *> Player::oplRenderToBuffer(float *buffer, tml_message *startMsg, double startMs, int sampleCount)
+{
+    const double playbackEnd = startMs + (sampleCount * (1000.0 / SAMPLE_RATE));
+    double curMs = startMs;
+    tml_message * curMsg = startMsg;
+
+    for (; curMsg && curMs >= curMsg->time; curMsg = curMsg->next) {
+        switch (curMsg->type) {
+        case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
+            opl_midi_changeprog(m_opl, curMsg->channel, curMsg->program);
+            break;
+        case TML_NOTE_ON: //play a note
+            opl_midi_noteon(m_opl, curMsg->channel, curMsg->key, curMsg->velocity);
+            break;
+        case TML_NOTE_OFF: //stop a note
+            opl_midi_noteoff(m_opl, curMsg->channel, curMsg->key);
+            break;
+        case TML_PITCH_BEND: //pitch wheel modification
+            opl_midi_pitchwheel(m_opl, curMsg->channel, ( curMsg->pitch_bend - 8192 ) / 64 );
+            break;
+        case TML_CONTROL_CHANGE: //MIDI controller messages
+            opl_midi_controller(m_opl, curMsg->channel, curMsg->control, curMsg->control_value );
+            break;
+        }
+    }
+
+    // Render the block of audio samples in float format
+    int len = sampleCount * 2 * sizeof(short);
+    void * tmpBuffer = malloc(len);
+    short * shortBuffer = (short *)tmpBuffer;
+    opl_render( m_opl, shortBuffer, sampleCount, 1 );
+    for (int i = 0; i < sampleCount * 2; i++) {
+        buffer[i] = (float) shortBuffer[i] / 32768.0f;
+    }
+    free(tmpBuffer);
+
+    return std::make_tuple(playbackEnd, curMsg);
 }
 
 std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_message *startMsg, double startMs, int sampleCount)
 {
+    if (!m_tinySoundFont) return oplRenderToBuffer(buffer, startMsg, startMs, sampleCount);
+
     const double playbackEnd = startMs + (sampleCount * (1000.0 / SAMPLE_RATE));
     double curMs = startMs;
     tml_message * curMsg = startMsg;
@@ -234,7 +295,7 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
 
 int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames)
 {
-    if (m_tinyMidiLoader && m_tinySoundFont && m_isPlaying) {
+    if (m_tinyMidiLoader && m_isPlaying) {
         std::uint8_t * buffer = (std::uint8_t *)outputBuffer;
         // Check and apply seek
         if (m_seekToMessagePos) {

@@ -16,6 +16,7 @@ public:
 
     bool loadMidiFile(const QString & path);
     void loadSoundFontFile(const QString & path);
+    void loadOP2File(const QString & path);
     void tryLoadFiles(const QList<QUrl> &urls, bool tryPlayAfterLoad = true, bool suppressWarningDlg = false);
     bool checkCanPlay(bool suppressWarningDlg = false);
     void tryPlay(bool suppressWarningDlg = false);
@@ -58,6 +59,7 @@ private:
     // callbacks
     void playerPlaybackCallback(unsigned int curMs);
 
+    int m_noSoundFontInfoBoxShownTimesCount = 0;
     QString m_currentSf2FilePath; //< Only set this value when SF2 file actually get loaded.
     QString m_currentMidiFilePath; //< Only set this value when MIDI file actually get loaded.
     QMenu *m_detectedSoundfontsMenu;
