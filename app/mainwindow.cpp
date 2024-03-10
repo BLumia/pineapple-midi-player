@@ -299,3 +299,9 @@ void MainWindow::on_renderBtn_clicked()
     Player::instance()->renderToWav(QFile::encodeName(path));
 }
 
+
+void MainWindow::on_actionRepeat_triggered()
+{
+    Player::instance()->setLoop(ui->actionRepeat->isChecked());
+}
+

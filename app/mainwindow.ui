@@ -147,6 +147,7 @@
     </property>
     <addaction name="action_Open"/>
     <addaction name="actionPlayOnDrop"/>
+    <addaction name="actionRepeat"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -215,6 +216,17 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionRepeat">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Repeat</string>
    </property>
   </action>
  </widget>

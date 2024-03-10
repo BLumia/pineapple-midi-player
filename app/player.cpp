@@ -65,6 +65,16 @@ void Player::seekTo(unsigned int ms)
     }
 }
 
+bool Player::loop() const
+{
+    return m_loop;
+}
+
+void Player::setLoop(bool loop)
+{
+    m_loop = loop;
+}
+
 std::map<Player::InfoType, std::variant<int, unsigned int> > Player::midiInfo() const
 {
     int usedChannels, usedPrograms, totalNotes;
@@ -241,13 +251,16 @@ int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned
                 = renderToBuffer((float*)buffer, m_currentPlaybackMessagePos, m_currentPlaybackMSec, SampleBlock);
         }
 
-        if (mf_playbackCallback) {
-            mf_playbackCallback(m_currentPlaybackMSec);
-        }
-
         if (!m_currentPlaybackMessagePos) {
             m_currentPlaybackMSec = 0;
             m_currentPlaybackMessagePos = m_tinyMidiLoader;
+            if (!m_loop) {
+                pause();
+            }
+        }
+
+        if (mf_playbackCallback) {
+            mf_playbackCallback(m_currentPlaybackMSec);
         }
     } else {
         float* buffer = (float*)outputBuffer;

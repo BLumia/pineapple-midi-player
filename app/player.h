@@ -26,6 +26,8 @@ public:
     void stop();
     bool isPlaying() const;
     void seekTo(unsigned int ms);
+    bool loop() const;
+    void setLoop(bool loop);
     std::map<enum InfoType, std::variant<int, unsigned int> > midiInfo() const;
 
     void setVolume(float volume);
@@ -49,6 +51,7 @@ private:
 
     float m_volume = 1;
     bool m_isPlaying = false;
+    bool m_loop = true;
 
     PaStream * m_stream;
     tml_message* m_tinyMidiLoader = NULL;
