@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../build/.rcc/resources_qrc.qrc">
-    <normaloff>:/icons/dist/app-icon.svg</normaloff>:/icons/dist/app-icon.svg</iconset>
+    <normaloff>:/icons/assets/icons/app-icon.svg</normaloff>:/icons/assets/icons/app-icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">

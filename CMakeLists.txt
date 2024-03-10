@@ -22,7 +22,7 @@ add_executable(${EXE_NAME} WIN32)
 
 qt_add_resources(${EXE_NAME} resources.qrc
     PREFIX "/icons"
-    FILES ./dist/app-icon.svg
+    FILES ./assets/icons/app-icon.svg
 )
 
 target_sources(${EXE_NAME}
@@ -41,6 +41,10 @@ PRIVATE
     libs/stb_vorbis.c
     libs/implements.c
 )
+
+if (WIN32)
+    target_sources(${EXE_NAME} PRIVATE assets/pineapple-midi-player.rc)
+endif ()
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)
 target_link_libraries(${EXE_NAME} PRIVATE Qt6::Widgets PortAudio::PortAudio)

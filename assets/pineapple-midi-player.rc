@@ -1,0 +1,17 @@
+IDI_ICON1               ICON    DISCARDABLE     "icons/app-icon.ico"
+1               VERSIONINFO
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "FileDescription", "Pineapple MIDI Player - SoundFont MIDI Player"
+            VALUE "LegalCopyright", "MIT/Expat License - Copyright (C) 2024 Gary Wang"
+            VALUE "ProductName", "Pineapple MIDI Player"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

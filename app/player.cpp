@@ -102,7 +102,10 @@ bool Player::loadMidiFile(const char *filePath)
 {
     stop();
 
+    tml_message * oldFile = m_tinyMidiLoader;
     m_tinyMidiLoader = tml_load_filename(filePath);
+    if (oldFile) tml_free(oldFile);
+
     if (!m_tinyMidiLoader) {
         fprintf(stderr, "Could not load MIDI file\n");
         return false;
@@ -115,7 +118,10 @@ bool Player::loadMidiFile(const char *filePath)
 bool Player::loadSF2File(const char *sf2Path)
 {
     // Load the SoundFont from a file
+    tsf * oldFile = m_tinySoundFont;
     m_tinySoundFont = tsf_load_filename(sf2Path);
+    if (oldFile) tsf_close(oldFile);
+
     if (!m_tinySoundFont) {
         fprintf(stderr, "Could not load SoundFont\n");
         return false;

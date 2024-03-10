@@ -278,7 +278,7 @@ void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox infoBox(this);
     infoBox.setIcon(QMessageBox::Information);
-    infoBox.setIconPixmap(QPixmap(":/icons/dist/app-icon.svg"));
+    infoBox.setIconPixmap(QPixmap(":/icons/assets/icons/app-icon.svg"));
     infoBox.setWindowTitle("About Pineapple MIDI Player");
     infoBox.setText(
         "Pineapple MIDI Player\n"
