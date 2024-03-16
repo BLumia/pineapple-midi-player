@@ -12,6 +12,8 @@
 #include <QStringList>
 #include <QStandardPaths>
 
+#include <portaudio.h>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -297,17 +299,62 @@ void MainWindow::on_actionHelp_triggered()
     QMessageBox::information(this, "Help", "You don't need help");
 }
 
-
 void MainWindow::on_actionAbout_triggered()
 {
+    const QString mitLicense(QStringLiteral(R"(Expat/MIT License
+
+Copyright &copy; 2024 BLumia
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+)"));
+
     QMessageBox infoBox(this);
     infoBox.setIcon(QMessageBox::Information);
     infoBox.setIconPixmap(QPixmap(":/icons/assets/icons/app-icon.svg"));
     infoBox.setWindowTitle("About Pineapple MIDI Player");
+    infoBox.setStandardButtons(QMessageBox::Ok);
+    QPushButton * btn = infoBox.addButton(tr("License"), QMessageBox::ActionRole);
+    connect(btn, &QPushButton::clicked, this, [this, &mitLicense](){
+        QMessageBox licenseBox(this);
+        licenseBox.setIcon(QMessageBox::Information);
+        licenseBox.setWindowTitle("License");
+        licenseBox.setText(mitLicense);
+        licenseBox.setTextFormat(Qt::MarkdownText);
+        licenseBox.exec();
+    });
     infoBox.setText(
         "Pineapple MIDI Player\n"
         "\n"
-        "Copyright (C) 2024 BLumia"
+        "Based on the following free software libraries:\n"
+        "\n" +
+        QString("- [Qt](https://www.qt.io/) %1\n").arg(QT_VERSION_STR) +
+        QString("- [PortAudio](https://www.portaudio.com/) %1.%2.%3\n").arg(Pa_GetVersionInfo()->versionMajor)
+                                                                       .arg(Pa_GetVersionInfo()->versionMinor)
+                                                                       .arg(Pa_GetVersionInfo()->versionSubMinor) +
+        "- `tsf.h` and `tml.h` from [TinySoundFont](https://github.com/schellingb/TinySoundFont/)\n"
+        "- `dr_wav.h` from [dr_libs](https://github.com/mackron/dr_libs)\n"
+        "- `stb_vorbis.c` from [stb](https://github.com/nothings/stb)\n"
+        "- `opl.h` from [dos-like](https://github.com/mattiasgustavsson/dos-like)\n"
+        "\n"
+        "[Source Code](https://github.com/BLumia/pineapple-midi-player)\n"
+        "\n"
+        "Copyright &copy; 2024 [BLumia](https://github.com/BLumia/)"
     );
     infoBox.setTextFormat(Qt::MarkdownText);
     infoBox.exec();
@@ -323,9 +370,14 @@ void MainWindow::on_renderBtn_clicked()
     Player::instance()->renderToWav(QFile::encodeName(path));
 }
 
-
 void MainWindow::on_actionRepeat_triggered()
 {
     Player::instance()->setLoop(ui->actionRepeat->isChecked());
+}
+
+void MainWindow::on_actionStayOnTop_triggered()
+{
+    setWindowFlag(Qt::WindowStaysOnTopHint, ui->actionStayOnTop->isChecked());
+    show();
 }
 

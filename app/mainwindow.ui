@@ -164,7 +164,14 @@
     <addaction name="actionDetectedSoundFonts"/>
     <addaction name="actionSelectSoundFont"/>
    </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionStayOnTop"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_View"/>
    <addaction name="menuSoundFont"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -227,6 +234,14 @@
    </property>
    <property name="text">
     <string>Repeat</string>
+   </property>
+  </action>
+  <action name="actionStayOnTop">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Stay on Top</string>
    </property>
   </action>
  </widget>

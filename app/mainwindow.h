@@ -30,23 +30,16 @@ signals:
 private slots:
     void on_playBtn_clicked();
     void on_stopBtn_clicked();
-
     void on_seekSlider_sliderReleased();
     void on_volumeSlider_valueChanged(int value);
-
     void on_actionExit_triggered();
-
     void on_action_Open_triggered();
-
     void on_actionSelectSoundFont_triggered();
-
     void on_actionHelp_triggered();
-
     void on_actionAbout_triggered();
-
     void on_renderBtn_clicked();
-
     void on_actionRepeat_triggered();
+    void on_actionStayOnTop_triggered();
 
 private:
     void dragEnterEvent(QDragEnterEvent *event) override;
