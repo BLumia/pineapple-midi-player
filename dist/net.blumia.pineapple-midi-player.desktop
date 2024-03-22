@@ -1,0 +1,15 @@
+[Desktop Entry]
+Categories=Audio;Midi;Qt;
+Comment=Pineapple MIDI Player is a simple SoundFont MIDI Player
+Comment[zh_CN]=菠萝 MIDI 播放器是一个简单的 SoundFont MIDI 播放器
+Exec=pmidi %F
+GenericName=MIDI Player
+GenericName[zh_CN]=MIDI 播放器
+Icon=net.blumia.pineapple-midi-player
+Keywords=MIDI;SoundFont;Sf2;
+MimeType=audio/midi;audio/x-midi;
+Name=Pineapple MIDI Player
+Name[zh_CN]=菠萝 MIDI 播放器
+StartupNotify=false
+Type=Application
+Terminal=false

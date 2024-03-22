@@ -152,14 +152,14 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionHelp"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuSoundFont">
     <property name="title">
-     <string>SoundFont</string>
+     <string>&amp;SoundFont</string>
     </property>
     <addaction name="actionDetectedSoundFonts"/>
     <addaction name="actionSelectSoundFont"/>
@@ -214,7 +214,7 @@
   </action>
   <action name="actionHelp">
    <property name="text">
-    <string>Help</string>
+    <string>&amp;Help</string>
    </property>
    <property name="shortcut">
     <string>F1</string>

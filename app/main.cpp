@@ -6,11 +6,23 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QTranslator>
 #include <QUrl>
+
+#ifdef CONAN2_STATIC_QT_BUG
+#include <QtPlugin>
+Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin)
+#endif // CONAN2_STATIC_QT
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QTranslator translator;
+    if (translator.load(QLocale(), QLatin1String("pineapple-midi-player"), QLatin1String("."), QLatin1String(":/i18n"))) {
+        a.installTranslator(&translator);
+    }
+    a.setApplicationDisplayName(QCoreApplication::translate("main", "Pineapple MIDI Player"));
 
     // parse commandline arguments
     QCommandLineParser parser;

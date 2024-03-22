@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.9.5)
 
-project(pineapple-midi-player)
+project(pineapple-midi-player
+    VERSION 1.0.0
+    HOMEPAGE_URL "https://github.com/BLumia/pineapple-midi-player"
+)
+
+# This is optional. Arch Linux's portaudio package doesn't have CMake support (for now).
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+
+include(GNUInstallDirs)
+
+option(CONAN2_STATIC_QT_BUG "Workaround conan 2 static Qt issue, see conan-io/conan-center-index#23045" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,9 +53,62 @@ PRIVATE
     libs/implements.c
 )
 
+qt_add_translations(${EXE_NAME}
+TS_FILES
+    translations/pineapple-midi-player.ts
+    translations/pineapple-midi-player.zh_CN.ts
+)
+
+target_compile_definitions(${EXE_NAME} PRIVATE
+    PMIDI_VERSION_STRING="${CMAKE_PROJECT_VERSION}"
+)
+
 if (WIN32)
     target_sources(${EXE_NAME} PRIVATE assets/pineapple-midi-player.rc)
 endif ()
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)
 target_link_libraries(${EXE_NAME} PRIVATE Qt6::Widgets PortAudio::PortAudio)
+
+if (CONAN2_STATIC_QT_BUG)
+    target_link_libraries(${EXE_NAME} PRIVATE Qt6::QWindowsIntegrationPlugin)
+    target_compile_definitions(${EXE_NAME} PRIVATE CONAN2_STATIC_QT_BUG)
+endif ()
+
+# Install -------------------------------------
+
+set(INSTALL_TARGETS_DEFAULT_ARGS
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Devel
+)
+
+install(
+    TARGETS ${EXE_NAME}
+    ${INSTALL_TARGETS_DEFAULT_ARGS}
+)
+
+if (UNIX)
+    if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        set(CMAKE_INSTALL_PREFIX /usr)
+    endif ()
+
+    # install icon
+    install(
+        FILES assets/icons/app-icon.svg
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps"
+        RENAME net.blumia.pineapple-midi-player.svg
+    )
+
+    # install shortcut
+    install(
+        FILES dist/net.blumia.pineapple-midi-player.desktop
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications"
+    )
+
+    # install app metadata file for appstream (and some other stuff using this metadata like snapcraft)
+    install(
+        FILES dist/appstream/net.blumia.pineapple-midi-player.metainfo.xml
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
+    )
+endif ()

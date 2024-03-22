@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>net.blumia.pineapple-midi-player</id>
+  <name>Pineapple MIDI Player</name>
+  <name xml:lang="zh-CN">菠萝 MIDI 播放器</name>
+  <summary>SoundFont MIDI Player</summary>
+  <summary xml:lang="zh-CN">SoundFont MIDI 播放器</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer_name>Gary (BLumia) Wang</developer_name>
+  <developer_name xml:lang="zh-CN">Gary (BLumia) Wang</developer_name>
+  <description>
+    <p>Pineapple MIDI Player is a simple SoundFont MIDI Player</p>
+    <p xml:lang="zh-CN">菠萝 MIDI 播放器是一个简单的 SoundFont MIDI 播放器</p>
+  </description>
+  <launchable type="desktop-id">net.blumia.pineapple-midi-player.desktop</launchable>
+  <url type="homepage">https://github.com/BLumia/pineapple-midi-player</url>
+  <url type="bugtracker">https://github.com/BLumia/pineapple-midi-player/issues</url>
+  <provides>
+    <binary>pmidi</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+</component>

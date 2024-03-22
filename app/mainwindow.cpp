@@ -119,7 +119,7 @@ void MainWindow::tryLoadFiles(const QList<QUrl> &urls, bool tryPlayAfterLoad, bo
 bool MainWindow::checkCanPlay(bool suppressWarningDlg)
 {
     if (m_currentMidiFilePath.isEmpty()) {
-        if (!suppressWarningDlg) QMessageBox::information(this, "Missing MIDI file", "Please load a MIDI file first.");
+        if (!suppressWarningDlg) QMessageBox::information(this, tr("Missing MIDI file"), tr("Please load a MIDI file first."));
         return false;
     }
 
@@ -136,8 +136,8 @@ bool MainWindow::checkCanPlay(bool suppressWarningDlg)
             }
 
             infoBox.setIcon(QMessageBox::Information);
-            infoBox.setWindowTitle("Missing SoundFont");
-            infoBox.setInformativeText("If you don't know where to get a SoundFont, check out <a href='https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list'>this page</a> provided by MuseScore.");
+            infoBox.setWindowTitle(tr("Missing SoundFont"));
+            infoBox.setInformativeText(tr("If you don't know where to get a SoundFont, check out <a href='https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list'>this page</a> provided by MuseScore."));
             infoBox.setText(helpText);
             infoBox.setTextFormat(Qt::MarkdownText);
             infoBox.exec();
@@ -296,7 +296,24 @@ void MainWindow::on_actionSelectSoundFont_triggered()
 
 void MainWindow::on_actionHelp_triggered()
 {
-    QMessageBox::information(this, "Help", "You don't need help");
+    const QString helpText = tr("Pineapple MIDI Player is a simple SoundFont MIDI player, which requires both MIDI file and SoundFont file to play.")
+                           % QStringLiteral("\n\n")
+                           % tr("You can simply drag and drop SoundFont or MIDI file to quickly load/replace a SoundFont or play the given MIDI file.")
+                           % QStringLiteral("\n\n")
+                           % tr("When trying to load a MIDI file, this player will try to load the SoundFont file with the same file name as the MIDI file by default, "
+                                "which is suitable for playing MIDI file extracted by, for example, [VGMTrans](https://github.com/vgmtrans/vgmtrans/).")
+                           % QStringLiteral("\n\n")
+                           % tr("If you don't know where to get a SoundFont, check out <a href='https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list'>this page</a> provided by MuseScore.")
+                           % QStringLiteral("\n\n")
+                           % tr("To be clear, this player is (currently) not intended to support all features in a MIDI or SoundFont file. If you want "
+                                "a more advanced MIDI player, consider try [QMidiPlayer](https://chrisoft.org/QMidiPlayer/) instead.");
+
+    QMessageBox helpBox(this);
+    helpBox.setIcon(QMessageBox::Information);
+    helpBox.setWindowTitle(tr("Help"));
+    helpBox.setText(helpText);
+    helpBox.setTextFormat(Qt::MarkdownText);
+    helpBox.exec();
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -327,7 +344,7 @@ SOFTWARE.
     QMessageBox infoBox(this);
     infoBox.setIcon(QMessageBox::Information);
     infoBox.setIconPixmap(QPixmap(":/icons/assets/icons/app-icon.svg"));
-    infoBox.setWindowTitle("About Pineapple MIDI Player");
+    infoBox.setWindowTitle(tr("About"));
     infoBox.setStandardButtons(QMessageBox::Ok);
     QPushButton * btn = infoBox.addButton(tr("License"), QMessageBox::ActionRole);
     connect(btn, &QPushButton::clicked, this, [this, &mitLicense](){
@@ -339,14 +356,14 @@ SOFTWARE.
         licenseBox.exec();
     });
     infoBox.setText(
-        "Pineapple MIDI Player\n"
-        "\n"
-        "Based on the following free software libraries:\n"
-        "\n" +
-        QString("- [Qt](https://www.qt.io/) %1\n").arg(QT_VERSION_STR) +
-        QString("- [PortAudio](https://www.portaudio.com/) %1.%2.%3\n").arg(Pa_GetVersionInfo()->versionMajor)
-                                                                       .arg(Pa_GetVersionInfo()->versionMinor)
-                                                                       .arg(Pa_GetVersionInfo()->versionSubMinor) +
+        "Pineapple MIDI Player " PMIDI_VERSION_STRING
+        "\n\n" %
+        tr("Based on the following free software libraries:") %
+        "\n\n" %
+        QStringLiteral("- [Qt](https://www.qt.io/) %1\n").arg(QT_VERSION_STR) %
+        QStringLiteral("- [PortAudio](https://www.portaudio.com/) %1.%2.%3\n").arg(Pa_GetVersionInfo()->versionMajor)
+                                                                              .arg(Pa_GetVersionInfo()->versionMinor)
+                                                                              .arg(Pa_GetVersionInfo()->versionSubMinor) %
         "- `tsf.h` and `tml.h` from [TinySoundFont](https://github.com/schellingb/TinySoundFont/)\n"
         "- `dr_wav.h` from [dr_libs](https://github.com/mackron/dr_libs)\n"
         "- `stb_vorbis.c` from [stb](https://github.com/nothings/stb)\n"
@@ -364,7 +381,7 @@ void MainWindow::on_renderBtn_clicked()
 {
     Player::instance()->stop();
 
-    QString path = QFileDialog::getSaveFileName(this, "Render to...", QStandardPaths::writableLocation(QStandardPaths::MusicLocation), "Wave File (*.wav)");
+    QString path = QFileDialog::getSaveFileName(this, tr("Render to..."), QStandardPaths::writableLocation(QStandardPaths::MusicLocation), "Wave File (*.wav)");
     if (path.isEmpty()) return;
 
     Player::instance()->renderToWav(QFile::encodeName(path));
