@@ -228,12 +228,23 @@ bool MainWindow::scanSoundfonts()
     paths.append(QCoreApplication::applicationDirPath());
     paths.removeDuplicates(); // under Windows, the app dir is already a part of GenericDataLocation
     for (const QString & path : std::as_const(paths)) {
-        QDir dir(path);
-        if (dir.exists() && dir.cd("soundfonts")) {
-            qDebug() << dir.absolutePath();
-            dir.setNameFilters(QStringList{"*.sf2", "*.sf3"});
-            dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-            results.append(dir.entryInfoList());
+        const QDir dir(path);
+        if (!dir.exists()) continue;
+        // Arch flavor soundfonts folder, may contain sf2 and sf3 file.
+        QDir soundfontsSubfolder(dir.filePath("soundfonts"));
+        if (soundfontsSubfolder.exists()) {
+            qDebug() << soundfontsSubfolder.absolutePath();
+            soundfontsSubfolder.setNameFilters(QStringList{"*.sf2", "*.sf3"});
+            soundfontsSubfolder.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+            results.append(soundfontsSubfolder.entryInfoList());
+        }
+        // Debian flavor soundfonts folder, we only scan sf2 here since tsf's sf3 support is not ideal for now.
+        QDir soundsSf2Subfolder(dir.filePath("sounds/sf2"));
+        if (soundsSf2Subfolder.exists()) {
+            qDebug() << soundsSf2Subfolder.absolutePath();
+            soundsSf2Subfolder.setNameFilters(QStringList{"*.sf2"});
+            soundsSf2Subfolder.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+            results.append(soundsSf2Subfolder.entryInfoList());
         }
     }
 

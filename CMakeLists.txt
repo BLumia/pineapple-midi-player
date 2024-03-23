@@ -112,3 +112,20 @@ if (UNIX)
         DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
     )
 endif ()
+
+set(CPACK_GENERATOR "TBZ2")
+set(CPACK_PACKAGE_NAME "pineapple-midi-player")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A simple SoundFont MIDI Player")
+set(CPACK_PACKAGE_VENDOR "Gary Wang")
+set(CPACK_PACKAGE_CONTACT "https://github.com/BLumia/pineapple-midi-player/issues/")
+if(WIN32)
+    # ...
+elseif (APPLE)
+    # ...
+elseif (UNIX)
+    set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "timgm6mb-soundfont")
+endif()
+
+include(CPack)
