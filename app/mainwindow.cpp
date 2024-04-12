@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QStringList>
+#include <QStyleFactory>
 #include <QStandardPaths>
 
 #include <portaudio.h>
@@ -23,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     setAcceptDrops(true);
 
     adjustSize();
+    generateThemeMenu();
 
     scanSoundfonts();
 
@@ -266,6 +268,22 @@ bool MainWindow::scanSoundfonts()
     }
 
     return true;
+}
+
+void MainWindow::generateThemeMenu()
+{
+    m_themes = new QMenu();
+    ui->actionSetTheme->setMenu(m_themes);
+
+    const QStringList & themes = QStyleFactory::keys();
+    for (const QString & theme : themes) {
+        QAction * entry = m_themes->addAction(theme);
+        entry->setData(theme);
+        connect(entry, &QAction::triggered, this, [this](){
+            QAction * action = qobject_cast<QAction*>(QObject::sender());
+            qApp->setStyle(action->data().toString());
+        });
+    }
 }
 
 void MainWindow::playerPlaybackCallback(unsigned int curMs)

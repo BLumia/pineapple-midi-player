@@ -34,7 +34,7 @@ The following content can be saved to `conanfile.txt` for you to use:
 
 ```ini
 [requires]
-qt/6.6.2
+qt/6.7.0
 portaudio/master
 
 [generators]

@@ -48,6 +48,7 @@ private:
 
     bool ensureWeHaveSoundfont();
     bool scanSoundfonts();
+    void generateThemeMenu();
 
     // callbacks
     void playerPlaybackCallback(unsigned int curMs);
@@ -56,6 +57,7 @@ private:
     QString m_currentSf2FilePath; //< Only set this value when SF2 file actually get loaded.
     QString m_currentMidiFilePath; //< Only set this value when MIDI file actually get loaded.
     QMenu *m_detectedSoundfontsMenu;
+    QMenu *m_themes;
 
     Ui::MainWindow *ui;
 };
