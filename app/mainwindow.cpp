@@ -1,7 +1,12 @@
+// SPDX-FileCopyrightText: 2024 Gary Wang <git@blumia.net>
+//
+// SPDX-License-Identifier: MIT
+
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
 #include "player.h"
+#include "settings.h"
 
 #include <QDir>
 #include <QDropEvent>
@@ -23,8 +28,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setAcceptDrops(true);
 
-    adjustSize();
     generateThemeMenu();
+    adjustSize();
+
+    setWindowFlag(Qt::WindowStaysOnTopHint, Settings::instance()->stayOnTop());
+    ui->actionStayOnTop->setChecked(Settings::instance()->stayOnTop());
 
     scanSoundfonts();
 
@@ -282,6 +290,7 @@ void MainWindow::generateThemeMenu()
         connect(entry, &QAction::triggered, this, [this](){
             QAction * action = qobject_cast<QAction*>(QObject::sender());
             qApp->setStyle(action->data().toString());
+            Settings::instance()->setApplicationStyle(action->data().toString());
         });
     }
 }
@@ -424,6 +433,7 @@ void MainWindow::on_actionRepeat_triggered()
 void MainWindow::on_actionStayOnTop_triggered()
 {
     setWindowFlag(Qt::WindowStaysOnTopHint, ui->actionStayOnTop->isChecked());
+    Settings::instance()->setStayOnTop(ui->actionStayOnTop->isChecked());
     show();
 }
 

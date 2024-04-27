@@ -18,7 +18,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 "6.6" REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt6 "6.4" REQUIRED COMPONENTS Widgets LinguistTools)
 find_package(PortAudio REQUIRED)
 
 if(NOT TARGET PortAudio::PortAudio AND TARGET portaudio)
@@ -43,6 +43,10 @@ PRIVATE
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
+    app/seekableslider.cpp
+    app/seekableslider.h
+    app/settings.cpp
+    app/settings.h
 
     # vendored libs
     libs/tsf.h
@@ -52,6 +56,8 @@ PRIVATE
     libs/stb_vorbis.c
     libs/implements.c
 )
+
+target_include_directories(${EXE_NAME} PRIVATE app)
 
 qt_add_translations(${EXE_NAME}
 TS_FILES
@@ -65,6 +71,11 @@ target_compile_definitions(${EXE_NAME} PRIVATE
 
 if (WIN32)
     target_sources(${EXE_NAME} PRIVATE assets/pineapple-midi-player.rc)
+
+    # Extra build settings
+    target_compile_definitions(${EXE_NAME} PRIVATE
+        FLAG_PORTABLE_MODE_SUPPORT=1
+    )
 endif ()
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)

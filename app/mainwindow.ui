@@ -61,7 +61,13 @@
      </layout>
     </item>
     <item>
-     <widget class="QSlider" name="seekSlider">
+     <widget class="SeekableSlider" name="seekSlider">
+      <property name="singleStep">
+       <number>0</number>
+      </property>
+      <property name="pageStep">
+       <number>0</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Orientation::Horizontal</enum>
       </property>
@@ -266,6 +272,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SeekableSlider</class>
+   <extends>QSlider</extends>
+   <header>seekableslider.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-Debug/.rcc/resources_qrc.qrc"/>
  </resources>

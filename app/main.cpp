@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "mainwindow.h"
+#include "settings.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
     if (translator.load(QLocale(), QLatin1String("pineapple-midi-player"), QLatin1String("."), QLatin1String(":/i18n"))) {
         a.installTranslator(&translator);
     }
+    a.setApplicationName("Pineapple MIDI Player");
     a.setApplicationDisplayName(QCoreApplication::translate("main", "Pineapple MIDI Player"));
 
     // parse commandline arguments
@@ -29,6 +31,10 @@ int main(int argc, char *argv[])
     parser.addPositionalArgument("File list", QCoreApplication::translate("main", "File list."));
     parser.addHelpOption();
     parser.process(a);
+
+    if (!Settings::instance()->applicationStyle().isEmpty()) {
+        qApp->setStyle(Settings::instance()->applicationStyle());
+    }
 
     MainWindow w;
     w.show();
