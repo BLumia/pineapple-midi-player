@@ -45,6 +45,8 @@ private slots:
     void on_actionRepeat_triggered();
     void on_actionStayOnTop_triggered();
 
+    void on_actionOpenWith_triggered();
+
 private:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;

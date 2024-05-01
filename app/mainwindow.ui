@@ -152,8 +152,12 @@
      <string>&amp;File</string>
     </property>
     <addaction name="action_Open"/>
+    <addaction name="separator"/>
     <addaction name="actionPlayOnDrop"/>
     <addaction name="actionRepeat"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpenWith"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -269,6 +273,11 @@
   <action name="actionSetTheme">
    <property name="text">
     <string>Set Theme</string>
+   </property>
+  </action>
+  <action name="actionOpenWith">
+   <property name="text">
+    <string>Open With...</string>
    </property>
   </action>
  </widget>

@@ -8,6 +8,10 @@
 #include "player.h"
 #include "settings.h"
 
+#ifdef Q_OS_WIN
+#include "widgetsopenwithhandler_win.cpp" // displayNativeOpenWithDialog
+#endif
+
 #include <QDir>
 #include <QDropEvent>
 #include <QFileInfo>
@@ -406,6 +410,9 @@ SOFTWARE.
         "- `dr_wav.h` from [dr_libs](https://github.com/mackron/dr_libs)\n"
         "- `stb_vorbis.c` from [stb](https://github.com/nothings/stb)\n"
         "- `opl.h` from [dos-like](https://github.com/mattiasgustavsson/dos-like)\n"
+#ifdef Q_OS_WIN
+        "- `widgetsopenwithhandler_win.cpp` from [KIO](https://invent.kde.org/frameworks/kio)\n"
+#endif
         "\n"
         "[Source Code](https://github.com/BLumia/pineapple-midi-player)\n"
         "\n"
@@ -437,3 +444,14 @@ void MainWindow::on_actionStayOnTop_triggered()
     show();
 }
 
+void MainWindow::on_actionOpenWith_triggered()
+{
+#ifdef Q_OS_WIN
+    if (m_currentMidiFilePath.isEmpty()) return;
+
+    displayNativeOpenWithDialog({QUrl::fromLocalFile(m_currentMidiFilePath)}, this);
+#else
+    // TODO: use KIO::WidgetsOpenWithHandler::promptUserForApplication()
+    //       or KFileItemActions::insertOpenWithActionsTo()?
+#endif
+}
