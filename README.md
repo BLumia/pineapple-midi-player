@@ -10,6 +10,7 @@ Based on the following projects:
 - `stb_vorbis.c` from [stb](https://github.com/nothings/stb/) (Public Domain or MIT License)
 - `dr_wav.h` from [dr_libs](https://github.com/mackron/dr_libs) (Public Domain or MIT License)
 - `opl.h` from [dos-like](https://github.com/mattiasgustavsson/dos-like) (BSD 3-Clause License)
+- *(optional)* [KIO](https://invent.kde.org/frameworks/kio) (LGPLv2+ License)
 
 ## Build it...
 

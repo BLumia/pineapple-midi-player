@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9.5)
 
 project(pineapple-midi-player
-    VERSION 1.1.0
+    VERSION 1.2.0
     HOMEPAGE_URL "https://github.com/BLumia/pineapple-midi-player"
 )
 
@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 include(GNUInstallDirs)
 
+option(USE_KIO "Use KIO-based open-with action" ON)
 option(CONAN2_STATIC_QT_BUG "Workaround conan 2 static Qt issue, see conan-io/conan-center-index#23045" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -20,6 +21,12 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 "6.4" REQUIRED COMPONENTS Widgets LinguistTools)
 find_package(PortAudio REQUIRED)
+
+if(USE_KIO)
+    find_package(ECM 6.0.0 NO_MODULE)
+    set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+    find_package(KF6KIO 6.0.0 COMPONENTS KIOWidgets)
+endif()
 
 if(NOT TARGET PortAudio::PortAudio AND TARGET portaudio)
     # the current latest released tag (19.7.0) doesn't provide the PortAudio::portaudio target
@@ -80,6 +87,11 @@ endif ()
 
 target_include_directories(${EXE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/libs)
 target_link_libraries(${EXE_NAME} PRIVATE Qt6::Widgets PortAudio::PortAudio)
+
+if (TARGET KF6::KIOWidgets)
+    target_link_libraries(${EXE_NAME} PRIVATE KF6::KIOWidgets)
+    target_compile_definitions(${EXE_NAME} PRIVATE HAVE_KIO)
+endif ()
 
 if (CONAN2_STATIC_QT_BUG)
     target_link_libraries(${EXE_NAME} PRIVATE Qt6::QWindowsIntegrationPlugin)

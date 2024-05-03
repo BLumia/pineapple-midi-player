@@ -9,6 +9,9 @@
 #include "settings.h"
 
 #ifdef Q_OS_WIN
+// copied from KIO, thus we won't depend on KIO for the open with dialog
+// note that KIO on Linux also offer extra menu actions than just a open with dialog,
+// so it's still suggested to use KIO under Linux
 #include "widgetsopenwithhandler_win.cpp" // displayNativeOpenWithDialog
 #endif
 
@@ -21,6 +24,11 @@
 #include <QStringList>
 #include <QStyleFactory>
 #include <QStandardPaths>
+
+#ifdef HAVE_KIO
+#include <KFileItemActions>
+#include <KFileItemListProperties>
+#endif // HAVE_KIO
 
 #include <portaudio.h>
 
@@ -55,6 +63,18 @@ MainWindow::MainWindow(QWidget *parent)
         unsigned int duration = std::get<unsigned int>(info[Player::I_LENGTH_MS]);
         ui->seekSlider->setMaximum(duration);
         ui->durationLabel->setText(QTime::fromMSecsSinceStartOfDay(0).addMSecs(duration).toString("m:ss").toLatin1().data());
+
+        // menu state
+        ui->actionOpenWith->setEnabled(true);
+#ifdef HAVE_KIO
+        QMenu * openWithSubmenu = new QMenu();
+        KFileItemActions * actions = new KFileItemActions(openWithSubmenu);
+        KFileItemListProperties itemProperties(KFileItemList{KFileItem(QUrl::fromLocalFile(path))});
+        actions->setItemListProperties(itemProperties);
+        actions->setParentWidget(openWithSubmenu);
+        actions->insertOpenWithActionsTo(nullptr, openWithSubmenu, QStringList());
+        ui->actionOpenWith->setMenu(openWithSubmenu);
+#endif // HAVE_KIO
     });
 
     connect(this, &MainWindow::soundfontLoaded, this, [this](const QString path){
@@ -413,6 +433,9 @@ SOFTWARE.
 #ifdef Q_OS_WIN
         "- `widgetsopenwithhandler_win.cpp` from [KIO](https://invent.kde.org/frameworks/kio)\n"
 #endif
+#ifdef HAVE_KIO
+        % QStringLiteral("- [KIO](https://invent.kde.org/frameworks/kio) %1\n").arg(KIO_VERSION_STRING) %
+#endif
         "\n"
         "[Source Code](https://github.com/BLumia/pineapple-midi-player)\n"
         "\n"
@@ -444,14 +467,15 @@ void MainWindow::on_actionStayOnTop_triggered()
     show();
 }
 
+// this action won't get triggered if HAVE_KIO is defined. Menu actions provided by KIO
+// is lived as a submenu of this action.
 void MainWindow::on_actionOpenWith_triggered()
 {
-#ifdef Q_OS_WIN
     if (m_currentMidiFilePath.isEmpty()) return;
-
+#ifdef Q_OS_WIN
     displayNativeOpenWithDialog({QUrl::fromLocalFile(m_currentMidiFilePath)}, this);
 #else
-    // TODO: use KIO::WidgetsOpenWithHandler::promptUserForApplication()
-    //       or KFileItemActions::insertOpenWithActionsTo()?
+    QMessageBox::information(this, tr("Feature not available"),
+                             tr("Consider build against <a href='https://invent.kde.org/frameworks/kio'>KIO</a> to use this feature."));
 #endif
 }
