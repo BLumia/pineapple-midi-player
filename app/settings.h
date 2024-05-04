@@ -15,9 +15,11 @@ public:
 
     bool stayOnTop() const;
     QString applicationStyle() const;
+    QString fallbackSoundFont() const;
 
     void setStayOnTop(bool on);
     void setApplicationStyle(const QString & styleName);
+    void setFallbackSoundFont(const QString & path);
 
 private:
     Settings();

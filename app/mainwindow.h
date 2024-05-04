@@ -32,6 +32,8 @@ signals:
     void soundfontLoaded(const QString path);
 
 private slots:
+    void loadSpecificSoundFontActionTriggered();
+
     void on_playBtn_clicked();
     void on_stopBtn_clicked();
     void on_seekSlider_sliderReleased();
@@ -44,8 +46,8 @@ private slots:
     void on_renderBtn_clicked();
     void on_actionRepeat_triggered();
     void on_actionStayOnTop_triggered();
-
     void on_actionOpenWith_triggered();
+    void on_actionSelectFallbackSoundFont_triggered();
 
 private:
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -55,6 +57,7 @@ private:
     bool ensureWeHaveSoundfont();
     bool scanSoundfonts();
     void generateThemeMenu();
+    bool updateFallbackSoundFontAction(const QString & path);
 
     // callbacks
     void playerPlaybackCallback(unsigned int curMs);

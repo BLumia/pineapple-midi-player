@@ -171,6 +171,14 @@
     <property name="title">
      <string>&amp;SoundFont</string>
     </property>
+    <widget class="QMenu" name="menuFallback_SoundFont">
+     <property name="title">
+      <string>Fallback SoundFont</string>
+     </property>
+     <addaction name="actionFallbackSoundFont"/>
+     <addaction name="actionSelectFallbackSoundFont"/>
+    </widget>
+    <addaction name="menuFallback_SoundFont"/>
     <addaction name="actionDetectedSoundFonts"/>
     <addaction name="actionSelectSoundFont"/>
    </widget>
@@ -281,6 +289,19 @@
    </property>
    <property name="text">
     <string>Open With...</string>
+   </property>
+  </action>
+  <action name="actionFallbackSoundFont">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>No Fallback SoundFont</string>
+   </property>
+  </action>
+  <action name="actionSelectFallbackSoundFont">
+   <property name="text">
+    <string>Select Fallback SoundFont...</string>
    </property>
   </action>
  </widget>

@@ -58,9 +58,20 @@ QString Settings::applicationStyle() const
     return m_qsettings->value("application_style", QString()).toString();
 }
 
+QString Settings::fallbackSoundFont() const
+{
+    return m_qsettings->value("fallback_soundfont", QString()).toString();
+}
+
 void Settings::setApplicationStyle(const QString &styleName)
 {
     m_qsettings->setValue("application_style", styleName);
+    m_qsettings->sync();
+}
+
+void Settings::setFallbackSoundFont(const QString &path)
+{
+    m_qsettings->setValue("fallback_soundfont", path);
     m_qsettings->sync();
 }
 

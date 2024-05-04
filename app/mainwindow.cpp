@@ -47,6 +47,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionStayOnTop->setChecked(Settings::instance()->stayOnTop());
 
     scanSoundfonts();
+    updateFallbackSoundFontAction(Settings::instance()->fallbackSoundFont());
+
+    connect(ui->actionFallbackSoundFont, &QAction::triggered, this, &MainWindow::loadSpecificSoundFontActionTriggered);
 
     Player::instance()->setPlaybackCallback(std::bind(&MainWindow::playerPlaybackCallback, this, std::placeholders::_1));
     Player::instance()->onIsPlayingChanged([this](bool isPlaying){
@@ -206,6 +209,15 @@ QList<QUrl> MainWindow::convertToUrlList(const QStringList &files)
     return urlList;
 }
 
+void MainWindow::loadSpecificSoundFontActionTriggered()
+{
+    QAction * action = qobject_cast<QAction*>(QObject::sender());
+    loadSoundFontFile(action->data().toString());
+    if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier)) {
+        Settings::instance()->setFallbackSoundFont(action->data().toString());
+    }
+}
+
 void MainWindow::on_playBtn_clicked()
 {
     Player::instance()->isPlaying() ? Player::instance()->pause() : tryPlay(false);
@@ -248,8 +260,13 @@ void MainWindow::dropEvent(QDropEvent *event)
 bool MainWindow::ensureWeHaveSoundfont()
 {
     if (m_currentSf2FilePath.isEmpty()) {
-        // TODO: attempt to load fallback soundfont
-        return false;
+        if (ui->actionFallbackSoundFont->isEnabled()) {
+            ui->actionFallbackSoundFont->trigger();
+            return true;
+        } else {
+            // TODO: maybe select one from the detected soundfonts?
+            return false;
+        }
     } else {
         return true;
     }
@@ -293,10 +310,7 @@ bool MainWindow::scanSoundfonts()
     for (const QFileInfo & result : std::as_const(results)) {
         QAction * entry = m_detectedSoundfontsMenu->addAction(result.fileName());
         entry->setData(result.absoluteFilePath());
-        connect(entry, &QAction::triggered, this, [this](){
-            QAction * action = qobject_cast<QAction*>(QObject::sender());
-            loadSoundFontFile(action->data().toString());
-        });
+        connect(entry, &QAction::triggered, this, &MainWindow::loadSpecificSoundFontActionTriggered);
     }
 
     return true;
@@ -317,6 +331,19 @@ void MainWindow::generateThemeMenu()
             Settings::instance()->setApplicationStyle(action->data().toString());
         });
     }
+}
+
+bool MainWindow::updateFallbackSoundFontAction(const QString &path)
+{
+    QFileInfo info(path);
+    if (!info.exists()) return false;
+
+    Settings::instance()->setFallbackSoundFont(info.absoluteFilePath());
+    ui->actionFallbackSoundFont->setEnabled(true);
+    ui->actionFallbackSoundFont->setText(info.fileName());
+    ui->actionFallbackSoundFont->setData(info.absoluteFilePath());
+
+    return true;
 }
 
 void MainWindow::playerPlaybackCallback(unsigned int curMs)
@@ -479,3 +506,10 @@ void MainWindow::on_actionOpenWith_triggered()
                              tr("Consider build against <a href='https://invent.kde.org/frameworks/kio'>KIO</a> to use this feature."));
 #endif
 }
+
+void MainWindow::on_actionSelectFallbackSoundFont_triggered()
+{
+    const QString &sfpath = QFileDialog::getOpenFileName(this, tr("Select SoundFont..."), QString(), "SoundFont (*.sf2 *.sf3)");
+    updateFallbackSoundFontAction(sfpath);
+}
+
