@@ -22,33 +22,33 @@
         <location filename="../app/mainwindow.ui" line="81"/>
         <location filename="../app/mainwindow.cpp" line="57"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiedergabe</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="88"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="95"/>
         <source>Convert to Wav</source>
-        <translation type="unfinished"></translation>
+        <translation>In Wav umwandeln</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="152"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Datei</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="402"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Hilfe</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="165"/>
         <location filename="../app/mainwindow.ui" line="248"/>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Hilfe</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="172"/>
@@ -63,27 +63,27 @@
     <message>
         <location filename="../app/mainwindow.ui" line="187"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ansicht</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="193"/>
         <source>&amp;Options</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Optionen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="211"/>
         <source>Auto Play Dropped File</source>
-        <translation type="unfinished"></translation>
+        <translation>Abgelegte Datei automatisch abspielen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="219"/>
         <source>E&amp;xit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Beenden</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="230"/>
         <source>&amp;Open</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Öffnen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="238"/>
@@ -101,12 +101,12 @@
         <location filename="../app/mainwindow.ui" line="259"/>
         <location filename="../app/mainwindow.cpp" line="436"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Über</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="270"/>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="278"/>
@@ -116,12 +116,12 @@
     <message>
         <location filename="../app/mainwindow.ui" line="283"/>
         <source>Set Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Thema festlegen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="291"/>
         <source>Open With...</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffnen mit...</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="299"/>
@@ -142,17 +142,17 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="56"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Pause</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="159"/>
         <source>Missing MIDI file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehlende MIDI-Datei</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="159"/>
         <source>Please load a MIDI file first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte laden Sie zuerst eine MIDI-Datei.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="169"/>
@@ -172,7 +172,7 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="374"/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffnen...</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="388"/>
@@ -197,12 +197,12 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="438"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>Lizenz</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="450"/>
         <source>Based on the following free software libraries:</source>
-        <translation type="unfinished"></translation>
+        <translation>Basiert auf den folgenden freien Software-Bibliotheken:</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="479"/>
@@ -212,7 +212,7 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="505"/>
         <source>Feature not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Funktion nicht verfügbar</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="506"/>
@@ -230,7 +230,7 @@
     <message>
         <location filename="../app/main.cpp" line="31"/>
         <source>File list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateiliste.</translation>
     </message>
 </context>
 </TS>
