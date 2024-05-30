@@ -24,6 +24,7 @@
 #include <QStringList>
 #include <QStyleFactory>
 #include <QStandardPaths>
+#include <QStringBuilder>
 
 #ifdef HAVE_KIO
 #include <KFileItemActions>
