@@ -16,7 +16,7 @@ Based on the following projects:
 
 ### ...manually
 
-Ensure CMake, Qt 6 (at least 6.6) and PortAudio are available, then regular cmake building steps applies:
+Ensure CMake, Qt 6 (at least 6.4) and PortAudio are available, then regular cmake building steps applies:
 
 ```shell
 $ mkdir build && cd build
@@ -35,7 +35,7 @@ The following content can be saved to `conanfile.txt` for you to use:
 
 ```ini
 [requires]
-qt/6.7.0
+qt/6.7.1
 portaudio/master
 
 [generators]

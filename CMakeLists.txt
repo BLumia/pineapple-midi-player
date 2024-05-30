@@ -69,6 +69,7 @@ target_include_directories(${EXE_NAME} PRIVATE app)
 qt_add_translations(${EXE_NAME}
 TS_FILES
     translations/pineapple-midi-player.ts
+    translations/pineapple-midi-player.de.ts
     translations/pineapple-midi-player.zh_CN.ts
 )
 
