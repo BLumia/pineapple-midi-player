@@ -26,11 +26,11 @@
 #include <QStyleFactory>
 #include <QStandardPaths>
 #include <QStringBuilder>
+#include <QTimer>
 
 #ifdef HAVE_KIO
 #include <KFileItemActions>
 #include <KFileItemListProperties>
-#include <QTimer>
 #endif // HAVE_KIO
 
 #include <portaudio.h>
