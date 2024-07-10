@@ -54,6 +54,8 @@ PRIVATE
     app/seekableslider.h
     app/settings.cpp
     app/settings.h
+    app/playlistmanager.cpp
+    app/playlistmanager.h
 
     # vendored libs
     libs/tsf.h

@@ -7,6 +7,7 @@
 
 #include "player.h"
 #include "settings.h"
+#include "playlistmanager.h"
 
 #ifdef Q_OS_WIN
 // copied from KIO, thus we won't depend on KIO for the open with dialog
@@ -29,6 +30,7 @@
 #ifdef HAVE_KIO
 #include <KFileItemActions>
 #include <KFileItemListProperties>
+#include <QTimer>
 #endif // HAVE_KIO
 
 #include <portaudio.h>
@@ -37,9 +39,14 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_detectedSoundfontsMenu(nullptr)
+    , m_playlistManager(new PlaylistManager(PlaylistManager::PL_SAMEFOLDER, this))
 {
     ui->setupUi(this);
     setAcceptDrops(true);
+    ui->playlistView->setModel(&m_stringListModel);
+    ui->playlistView->setVisible(ui->actionTogglePlaylist->isChecked());
+
+    m_playlistManager->setAutoLoadFilterSuffix({"*.mid"});
 
     generateThemeMenu();
     adjustSize();
@@ -86,6 +93,15 @@ MainWindow::MainWindow(QWidget *parent)
         ui->soundFontFileLabel->setText(fi.fileName());
         m_currentSf2FilePath = path;
     });
+
+    connect(m_playlistManager, &PlaylistManager::loaded, this, [this](){
+        QStringList playlist;
+        for (int i = 0; i < m_playlistManager->count(); i++) {
+            playlist << m_playlistManager->at(i);
+        }
+        m_stringListModel.setStringList(playlist);
+        ui->playlistView->setCurrentIndex(m_stringListModel.index(m_playlistManager->property("currentIndex").toInt()));
+    });
 }
 
 MainWindow::~MainWindow()
@@ -110,7 +126,7 @@ bool MainWindow::loadMidiFile(const QString &path)
                 }
             }
         }
-        return false;
+        return succ;
     }
     return false;
 }
@@ -136,16 +152,28 @@ void MainWindow::loadOP2File(const QString &path)
 void MainWindow::tryLoadFiles(const QList<QUrl> &urls, bool tryPlayAfterLoad, bool suppressWarningDlg)
 {
     const QStringList soundfontFormats{"sf2", "sf3"};
+    QList<QUrl> loadedMidiFiles;
 
     for (const QUrl & url : urls) {
         QFileInfo fi(url.toLocalFile());
         QString suffix(fi.suffix().toLower());
         if (suffix == "mid") {
-            loadMidiFile(fi.absoluteFilePath());
+            bool succ = loadMidiFile(fi.absoluteFilePath());
+            if (succ) {
+                loadedMidiFiles << QUrl::fromLocalFile(fi.absoluteFilePath());
+            }
         } else if (soundfontFormats.contains(fi.suffix().toLower())) {
             loadSoundFontFile(fi.absoluteFilePath());
         } else if (suffix == "op2") {
             loadOP2File(fi.absoluteFilePath());
+        }
+    }
+
+    if (loadedMidiFiles.count() > 0) {
+        if (loadedMidiFiles.count() == 1) {
+            m_playlistManager->setCurrentFile(loadedMidiFiles.at(0));
+        } else {
+            m_playlistManager->setPlaylist(loadedMidiFiles);
         }
     }
 
@@ -512,5 +540,22 @@ void MainWindow::on_actionSelectFallbackSoundFont_triggered()
 {
     const QString &sfpath = QFileDialog::getOpenFileName(this, tr("Select SoundFont..."), QString(), "SoundFont (*.sf2 *.sf3)");
     updateFallbackSoundFontAction(sfpath);
+}
+
+
+void MainWindow::on_playlistView_doubleClicked(const QModelIndex &index)
+{
+    QString file = m_stringListModel.data(index).toString();
+    tryLoadFiles({QUrl::fromLocalFile(file)});
+}
+
+
+void MainWindow::on_actionTogglePlaylist_toggled(bool visible)
+{
+    ui->playlistView->setVisible(visible);
+    // ensure adjustSize is called after UI updated.
+    QTimer::singleShot(0, this, [this](){
+        adjustSize();
+    });
 }
 

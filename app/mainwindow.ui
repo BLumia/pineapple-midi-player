@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>636</width>
-    <height>201</height>
+    <height>273</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,7 +20,7 @@
    <string>Pineapple MIDI Player</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-Debug/.rcc/resources_qrc.qrc">
+   <iconset resource="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-Debug/.qt/rcc/resources_qrc.qrc">
     <normaloff>:/icons/assets/icons/app-icon.svg</normaloff>:/icons/assets/icons/app-icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -136,6 +136,13 @@
       </item>
      </layout>
     </item>
+    <item>
+     <widget class="QListView" name="playlistView">
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -186,6 +193,8 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <addaction name="actionTogglePlaylist"/>
+    <addaction name="separator"/>
     <addaction name="actionStayOnTop"/>
    </widget>
    <widget class="QMenu" name="menu_Options">
@@ -304,6 +313,14 @@
     <string>Select Fallback SoundFont...</string>
    </property>
   </action>
+  <action name="actionTogglePlaylist">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Playlist</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -313,7 +330,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-Debug/.rcc/resources_qrc.qrc"/>
+  <include location="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-Debug/.qt/rcc/resources_qrc.qrc"/>
  </resources>
  <connections/>
 </ui>

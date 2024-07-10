@@ -20,7 +20,7 @@
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="81"/>
-        <location filename="../app/mainwindow.cpp" line="57"/>
+        <location filename="../app/mainwindow.cpp" line="65"/>
         <source>Play</source>
         <translation>Wiedergabe</translation>
     </message>
@@ -35,187 +35,192 @@
         <translation>In Wav umwandeln</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="152"/>
+        <location filename="../app/mainwindow.ui" line="159"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="402"/>
+        <location filename="../app/mainwindow.cpp" line="431"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="165"/>
-        <location filename="../app/mainwindow.ui" line="248"/>
+        <location filename="../app/mainwindow.ui" line="172"/>
+        <location filename="../app/mainwindow.ui" line="257"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="172"/>
+        <location filename="../app/mainwindow.ui" line="179"/>
         <source>&amp;SoundFont</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="176"/>
+        <location filename="../app/mainwindow.ui" line="183"/>
         <source>Fallback SoundFont</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="187"/>
+        <location filename="../app/mainwindow.ui" line="194"/>
         <source>&amp;View</source>
         <translation>&amp;Ansicht</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="193"/>
+        <location filename="../app/mainwindow.ui" line="202"/>
         <source>&amp;Options</source>
         <translation>&amp;Optionen</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="211"/>
+        <location filename="../app/mainwindow.ui" line="220"/>
         <source>Auto Play Dropped File</source>
         <translation>Abgelegte Datei automatisch abspielen</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="219"/>
+        <location filename="../app/mainwindow.ui" line="228"/>
         <source>E&amp;xit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="230"/>
+        <location filename="../app/mainwindow.ui" line="239"/>
         <source>&amp;Open</source>
         <translation>&amp;Öffnen</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="238"/>
+        <location filename="../app/mainwindow.ui" line="247"/>
         <source>Detected SoundFonts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="243"/>
-        <location filename="../app/mainwindow.cpp" line="381"/>
-        <location filename="../app/mainwindow.cpp" line="512"/>
+        <location filename="../app/mainwindow.ui" line="252"/>
+        <location filename="../app/mainwindow.cpp" line="410"/>
+        <location filename="../app/mainwindow.cpp" line="541"/>
         <source>Select SoundFont...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="259"/>
-        <location filename="../app/mainwindow.cpp" line="436"/>
+        <location filename="../app/mainwindow.ui" line="268"/>
+        <location filename="../app/mainwindow.cpp" line="465"/>
         <source>About</source>
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="270"/>
+        <location filename="../app/mainwindow.ui" line="279"/>
         <source>Repeat</source>
         <translation>Wiederholen</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="278"/>
+        <location filename="../app/mainwindow.ui" line="287"/>
         <source>Stay on Top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="283"/>
+        <location filename="../app/mainwindow.ui" line="292"/>
         <source>Set Theme</source>
         <translation>Thema festlegen</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="291"/>
+        <location filename="../app/mainwindow.ui" line="300"/>
         <source>Open With...</source>
         <translation>Öffnen mit...</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="299"/>
+        <location filename="../app/mainwindow.ui" line="308"/>
         <source>No Fallback SoundFont</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.ui" line="304"/>
+        <location filename="../app/mainwindow.ui" line="313"/>
         <source>Select Fallback SoundFont...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="177"/>
-        <location filename="../app/mainwindow.cpp" line="395"/>
+        <location filename="../app/mainwindow.ui" line="321"/>
+        <source>&amp;Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app/mainwindow.cpp" line="206"/>
+        <location filename="../app/mainwindow.cpp" line="424"/>
         <source>If you don&apos;t know where to get a SoundFont, check out &lt;a href=&apos;https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list&apos;&gt;this page&lt;/a&gt; provided by MuseScore.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="56"/>
+        <location filename="../app/mainwindow.cpp" line="64"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="159"/>
+        <location filename="../app/mainwindow.cpp" line="188"/>
         <source>Missing MIDI file</source>
         <translation>Fehlende MIDI-Datei</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="159"/>
+        <location filename="../app/mainwindow.cpp" line="188"/>
         <source>Please load a MIDI file first.</source>
         <translation>Bitte laden Sie zuerst eine MIDI-Datei.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="169"/>
+        <location filename="../app/mainwindow.cpp" line="198"/>
         <source>You need to select a SoundFont before play the MIDI file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="171"/>
+        <location filename="../app/mainwindow.cpp" line="200"/>
         <source>You have seen this dialog for %1 times, if you really don&apos;t want to use a SoundFont, you can now ignore this warning if you want.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="176"/>
+        <location filename="../app/mainwindow.cpp" line="205"/>
         <source>Missing SoundFont</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="374"/>
+        <location filename="../app/mainwindow.cpp" line="403"/>
         <source>Open...</source>
         <translation>Öffnen...</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="388"/>
+        <location filename="../app/mainwindow.cpp" line="417"/>
         <source>Pineapple MIDI Player is a simple SoundFont MIDI player, which requires both MIDI file and SoundFont file to play.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="390"/>
+        <location filename="../app/mainwindow.cpp" line="419"/>
         <source>You can simply drag and drop SoundFont or MIDI file to quickly load/replace a SoundFont or play the given MIDI file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="392"/>
+        <location filename="../app/mainwindow.cpp" line="421"/>
         <source>When trying to load a MIDI file, this player will try to load the SoundFont file with the same file name as the MIDI file by default, which is suitable for playing MIDI file extracted by, for example, [VGMTrans](https://github.com/vgmtrans/vgmtrans/).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="397"/>
+        <location filename="../app/mainwindow.cpp" line="426"/>
         <source>To be clear, this player is (currently) not intended to support all features in a MIDI or SoundFont file. If you want a more advanced MIDI player, consider try [QMidiPlayer](https://chrisoft.org/QMidiPlayer/) instead.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="438"/>
+        <location filename="../app/mainwindow.cpp" line="467"/>
         <source>License</source>
         <translation>Lizenz</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="450"/>
+        <location filename="../app/mainwindow.cpp" line="479"/>
         <source>Based on the following free software libraries:</source>
         <translation>Basiert auf den folgenden freien Software-Bibliotheken:</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="479"/>
+        <location filename="../app/mainwindow.cpp" line="508"/>
         <source>Render to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="505"/>
+        <location filename="../app/mainwindow.cpp" line="534"/>
         <source>Feature not available</source>
         <translation>Funktion nicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="506"/>
+        <location filename="../app/mainwindow.cpp" line="535"/>
         <source>Consider build against &lt;a href=&apos;https://invent.kde.org/frameworks/kio&apos;&gt;KIO&lt;/a&gt; to use this feature.</source>
         <translation type="unfinished"></translation>
     </message>

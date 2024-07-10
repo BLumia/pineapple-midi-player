@@ -5,11 +5,13 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QStringListModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class PlaylistManager;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -49,6 +51,10 @@ private slots:
     void on_actionOpenWith_triggered();
     void on_actionSelectFallbackSoundFont_triggered();
 
+    void on_playlistView_doubleClicked(const QModelIndex &index);
+
+    void on_actionTogglePlaylist_toggled(bool visible);
+
 private:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
@@ -67,6 +73,8 @@ private:
     QString m_currentMidiFilePath; //< Only set this value when MIDI file actually get loaded.
     QMenu *m_detectedSoundfontsMenu;
     QMenu *m_themes;
+    PlaylistManager *m_playlistManager;
+    QStringListModel m_stringListModel;
 
     Ui::MainWindow *ui;
 };
