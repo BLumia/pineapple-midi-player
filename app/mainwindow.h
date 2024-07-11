@@ -45,15 +45,13 @@ private slots:
     void on_actionSelectSoundFont_triggered();
     void on_actionHelp_triggered();
     void on_actionAbout_triggered();
-    void on_renderBtn_clicked();
     void on_actionRepeat_triggered();
     void on_actionStayOnTop_triggered();
     void on_actionOpenWith_triggered();
     void on_actionSelectFallbackSoundFont_triggered();
-
     void on_playlistView_doubleClicked(const QModelIndex &index);
-
     void on_actionTogglePlaylist_toggled(bool visible);
+    void on_actionConvertToWav_triggered();
 
 private:
     void dragEnterEvent(QDragEnterEvent *event) override;

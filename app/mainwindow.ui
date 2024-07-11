@@ -76,23 +76,38 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="playBtn">
+       <widget class="QToolButton" name="playBtn">
         <property name="text">
          <string>Play</string>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="stopBtn">
-        <property name="text">
-         <string>Stop</string>
+        <property name="icon">
+         <iconset theme="media-playback-start"/>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="renderBtn">
+       <widget class="QToolButton" name="stopBtn">
         <property name="text">
-         <string>Convert to Wav</string>
+         <string>Stop</string>
+        </property>
+        <property name="icon">
+         <iconset theme="media-playback-stop"/>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="togglePlaylistBtn">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -164,6 +179,7 @@
     <addaction name="actionRepeat"/>
     <addaction name="separator"/>
     <addaction name="actionOpenWith"/>
+    <addaction name="actionConvertToWav"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -253,6 +269,9 @@
    </property>
   </action>
   <action name="actionHelp">
+   <property name="icon">
+    <iconset theme="help-contents"/>
+   </property>
    <property name="text">
     <string>&amp;Help</string>
    </property>
@@ -274,6 +293,9 @@
    </property>
    <property name="checked">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="media-playlist-repeat-song"/>
    </property>
    <property name="text">
     <string>Repeat</string>
@@ -317,8 +339,19 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset theme="view-media-playlist"/>
+   </property>
    <property name="text">
     <string>&amp;Playlist</string>
+   </property>
+  </action>
+  <action name="actionConvertToWav">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Convert to Wav</string>
    </property>
   </action>
  </widget>

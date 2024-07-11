@@ -22,6 +22,7 @@
 #include <QMimeData>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QPushButton>
 #include <QStringList>
 #include <QStyleFactory>
 #include <QStandardPaths>
@@ -45,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     setAcceptDrops(true);
     ui->playlistView->setModel(&m_stringListModel);
     ui->playlistView->setVisible(ui->actionTogglePlaylist->isChecked());
+    ui->togglePlaylistBtn->setDefaultAction(ui->actionTogglePlaylist);
 
     m_playlistManager->setAutoLoadFilterSuffix({"*.mid"});
 
@@ -63,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent)
     Player::instance()->onIsPlayingChanged([this](bool isPlaying){
         ui->playBtn->setText(isPlaying ? QCoreApplication::translate("MainWindow", "Pause")
                                        : QCoreApplication::translate("MainWindow", "Play"));
+        ui->playBtn->setIcon(isPlaying ? QIcon::fromTheme("media-playback-pause")
+                                       : QIcon::fromTheme("media-playback-start"));
     });
 
     connect(this, &MainWindow::midiFileLoaded, this, [this](const QString path){
@@ -76,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->durationLabel->setText(QTime::fromMSecsSinceStartOfDay(0).addMSecs(duration).toString("m:ss").toLatin1().data());
 
         // menu state
+        ui->actionConvertToWav->setEnabled(true);
         ui->actionOpenWith->setEnabled(true);
 #ifdef HAVE_KIO
         QMenu * openWithSubmenu = new QMenu();
@@ -501,16 +506,6 @@ SOFTWARE.
     infoBox.exec();
 }
 
-void MainWindow::on_renderBtn_clicked()
-{
-    Player::instance()->stop();
-
-    QString path = QFileDialog::getSaveFileName(this, tr("Render to..."), QStandardPaths::writableLocation(QStandardPaths::MusicLocation), "Wave File (*.wav)");
-    if (path.isEmpty()) return;
-
-    Player::instance()->renderToWav(QFile::encodeName(path));
-}
-
 void MainWindow::on_actionRepeat_triggered()
 {
     Player::instance()->setLoop(ui->actionRepeat->isChecked());
@@ -557,5 +552,16 @@ void MainWindow::on_actionTogglePlaylist_toggled(bool visible)
     QTimer::singleShot(0, this, [this](){
         adjustSize();
     });
+}
+
+
+void MainWindow::on_actionConvertToWav_triggered()
+{
+    Player::instance()->stop();
+
+    QString path = QFileDialog::getSaveFileName(this, tr("Render to..."), QStandardPaths::writableLocation(QStandardPaths::MusicLocation), "Wave File (*.wav)");
+    if (path.isEmpty()) return;
+
+    Player::instance()->renderToWav(QFile::encodeName(path));
 }
 
