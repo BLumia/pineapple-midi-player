@@ -40,15 +40,15 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_detectedSoundfontsMenu(nullptr)
-    , m_playlistManager(new PlaylistManager(PlaylistManager::PL_SAMEFOLDER, this))
+    , m_playlistManager(new PlaylistManager(this))
 {
     ui->setupUi(this);
     setAcceptDrops(true);
-    ui->playlistView->setModel(&m_stringListModel);
+    ui->playlistView->setModel(m_playlistManager->model());
     ui->playlistView->setVisible(ui->actionTogglePlaylist->isChecked());
     ui->togglePlaylistBtn->setDefaultAction(ui->actionTogglePlaylist);
 
-    m_playlistManager->setAutoLoadFilterSuffix({"*.mid"});
+    m_playlistManager->setAutoLoadFilterSuffixes({"*.mid"});
 
     generateThemeMenu();
     adjustSize();
@@ -99,13 +99,8 @@ MainWindow::MainWindow(QWidget *parent)
         m_currentSf2FilePath = path;
     });
 
-    connect(m_playlistManager, &PlaylistManager::loaded, this, [this](){
-        QStringList playlist;
-        for (int i = 0; i < m_playlistManager->count(); i++) {
-            playlist << m_playlistManager->at(i);
-        }
-        m_stringListModel.setStringList(playlist);
-        ui->playlistView->setCurrentIndex(m_stringListModel.index(m_playlistManager->property("currentIndex").toInt()));
+    connect(m_playlistManager, &PlaylistManager::currentIndexChanged, this, [this](int index){
+        ui->playlistView->setCurrentIndex(m_playlistManager->curIndex());
     });
 }
 
@@ -174,13 +169,7 @@ void MainWindow::tryLoadFiles(const QList<QUrl> &urls, bool tryPlayAfterLoad, bo
         }
     }
 
-    if (loadedMidiFiles.count() > 0) {
-        if (loadedMidiFiles.count() == 1) {
-            m_playlistManager->setCurrentFile(loadedMidiFiles.at(0));
-        } else {
-            m_playlistManager->setPlaylist(loadedMidiFiles);
-        }
-    }
+    m_playlistManager->loadPlaylist(loadedMidiFiles);
 
     if (tryPlayAfterLoad) {
         tryPlay(suppressWarningDlg);
@@ -537,11 +526,10 @@ void MainWindow::on_actionSelectFallbackSoundFont_triggered()
     updateFallbackSoundFontAction(sfpath);
 }
 
-
-void MainWindow::on_playlistView_doubleClicked(const QModelIndex &index)
+void MainWindow::on_playlistView_activated(const QModelIndex &index)
 {
-    QString file = m_stringListModel.data(index).toString();
-    tryLoadFiles({QUrl::fromLocalFile(file)});
+    m_playlistManager->setCurrentIndex(index);
+    tryLoadFiles({m_playlistManager->urlByIndex(index)});
 }
 
 

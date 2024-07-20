@@ -49,7 +49,7 @@ private slots:
     void on_actionStayOnTop_triggered();
     void on_actionOpenWith_triggered();
     void on_actionSelectFallbackSoundFont_triggered();
-    void on_playlistView_doubleClicked(const QModelIndex &index);
+    void on_playlistView_activated(const QModelIndex &index);
     void on_actionTogglePlaylist_toggled(bool visible);
     void on_actionConvertToWav_triggered();
 
@@ -72,7 +72,6 @@ private:
     QMenu *m_detectedSoundfontsMenu;
     QMenu *m_themes;
     PlaylistManager *m_playlistManager;
-    QStringListModel m_stringListModel;
 
     Ui::MainWindow *ui;
 };
