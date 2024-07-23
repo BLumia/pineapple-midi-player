@@ -532,7 +532,6 @@ void MainWindow::on_playlistView_activated(const QModelIndex &index)
     tryLoadFiles({m_playlistManager->urlByIndex(index)});
 }
 
-
 void MainWindow::on_actionTogglePlaylist_toggled(bool visible)
 {
     ui->playlistView->setVisible(visible);
