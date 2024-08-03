@@ -55,6 +55,7 @@ private:
     std::tuple<double, tml_message *> renderToBuffer(float * buffer, tml_message * startMsg, double startMs, int sampleCount);
 
     static Player * m_player_instance;
+    bool setupAndStartStream();
     int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames);
 
     float m_volume = 1;

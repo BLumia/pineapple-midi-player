@@ -35,6 +35,15 @@ Player * Player::instance()
 
 void Player::play()
 {
+    PaError ret = Pa_IsStreamActive(m_stream);
+    if (ret == 0) {
+        fputs("Playback stream stopped, restarting...", stderr);
+        bool succ = setupAndStartStream();
+        if (!succ) {
+            fputs("Not able to restart playback stream", stderr);
+            return;
+        }
+    }
     m_isPlaying = true;
     if (mf_onIsPlayingChanged) mf_onIsPlayingChanged(m_isPlaying);
 }
@@ -208,13 +217,7 @@ Player::Player()
     m_opl = opl_create();
 
     Pa_Initialize();
-    Pa_OpenDefaultStream(&m_stream, 0, 2, paFloat32, SAMPLE_RATE, paFramesPerBufferUnspecified,
-        +[](const void *inputBuffer, void *outputBuffer,
-            unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
-            PaStreamCallbackFlags statusFlags, void *userData) -> int {
-                return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
-        }, this);
-    Pa_StartStream(m_stream);
+    setupAndStartStream();
 }
 
 Player::~Player()
@@ -295,6 +298,22 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
     tsf_render_float(m_tinySoundFont, buffer, sampleCount, 0);
 
     return std::make_tuple(playbackEnd, curMsg);
+}
+
+bool Player::setupAndStartStream()
+{
+    Pa_OpenDefaultStream(&m_stream, 0, 2, paFloat32, SAMPLE_RATE, paFramesPerBufferUnspecified,
+                         +[](const void *inputBuffer, void *outputBuffer,
+                             unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
+                             PaStreamCallbackFlags statusFlags, void *userData) -> int {
+                             return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
+                         }, this);
+    PaError err = Pa_StartStream(m_stream);
+    if (err != paNoError) {
+        // TODO: logging?
+        return false;
+    }
+    return true;
 }
 
 int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames)
