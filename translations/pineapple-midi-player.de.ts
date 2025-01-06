@@ -11,12 +11,12 @@
     <message>
         <location filename="../app/mainwindow.ui" line="31"/>
         <source>Drop SoundFont File here to load</source>
-        <translation type="unfinished"></translation>
+        <translation>SoundFont-Datei zum Laden hier ablegen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="38"/>
         <source>Drop MIDI File here to load</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI-Datei zum Laden hier ablegen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="81"/>
@@ -53,12 +53,12 @@
     <message>
         <location filename="../app/mainwindow.ui" line="179"/>
         <source>&amp;SoundFont</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;SoundFont</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="183"/>
         <source>Fallback SoundFont</source>
-        <translation type="unfinished"></translation>
+        <translation>Ersatz-SoundFont</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="194"/>
@@ -88,14 +88,14 @@
     <message>
         <location filename="../app/mainwindow.ui" line="247"/>
         <source>Detected SoundFonts</source>
-        <translation type="unfinished"></translation>
+        <translation>Erkannte SoundFonts</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="252"/>
         <location filename="../app/mainwindow.cpp" line="410"/>
         <location filename="../app/mainwindow.cpp" line="541"/>
         <source>Select SoundFont...</source>
-        <translation type="unfinished"></translation>
+        <translation>SoundFont auswählen ...</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="268"/>
@@ -111,7 +111,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="287"/>
         <source>Stay on Top</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Oben bleiben</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="292"/>
@@ -126,23 +126,23 @@
     <message>
         <location filename="../app/mainwindow.ui" line="308"/>
         <source>No Fallback SoundFont</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Ersatz-SoundFont</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="313"/>
         <source>Select Fallback SoundFont...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ersatz-SoundFont auswählen ...</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="321"/>
         <source>&amp;Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>%Wiedergabeliste</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="206"/>
         <location filename="../app/mainwindow.cpp" line="424"/>
         <source>If you don&apos;t know where to get a SoundFont, check out &lt;a href=&apos;https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list&apos;&gt;this page&lt;/a&gt; provided by MuseScore.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie nicht wissen, wo Sie einen SoundFont bekommen können, besuchen Sie &lt;a href=&apos;https://musescore.org/de/handbuch/soundfonts-und-sfz-dateien#list&apos;&gt;diese Seite&lt;/a&gt; von MuseScore.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="64"/>
@@ -162,17 +162,17 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="198"/>
         <source>You need to select a SoundFont before play the MIDI file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie müssen einen SoundFont auswählen, bevor Sie die MIDI-Datei abspielen können.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="200"/>
         <source>You have seen this dialog for %1 times, if you really don&apos;t want to use a SoundFont, you can now ignore this warning if you want.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben diesen Dialog bereits %1 Mal gesehen. Wenn Sie wirklich keinen SoundFont verwenden wollen, können Sie diese Warnung jetzt ignorieren.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="205"/>
         <source>Missing SoundFont</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehlender SoundFont</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="403"/>
@@ -182,22 +182,22 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="417"/>
         <source>Pineapple MIDI Player is a simple SoundFont MIDI player, which requires both MIDI file and SoundFont file to play.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pineapple MIDI Player ist ein einfacher SoundFont-MIDI-Abspieler, der zum Abspielen sowohl eine MIDI-Datei als auch eine SoundFont-Datei benötigt.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="419"/>
         <source>You can simply drag and drop SoundFont or MIDI file to quickly load/replace a SoundFont or play the given MIDI file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Durch einfaches Ziehen und Ablegen einer SoundFont- oder MIDI-Datei können Sie schnell eine SoundFont laden/ersetzen oder die angegebene MIDI-Datei abspielen.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="421"/>
         <source>When trying to load a MIDI file, this player will try to load the SoundFont file with the same file name as the MIDI file by default, which is suitable for playing MIDI file extracted by, for example, [VGMTrans](https://github.com/vgmtrans/vgmtrans/).</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie versuchen, eine MIDI-Datei zu laden, versucht dieser Abspieler standardmäßig, die SoundFont-Datei mit demselben Dateinamen wie die MIDI-Datei zu laden, was für die Wiedergabe von MIDI-Dateien geeignet ist, die z.&#xa0;B. mit [VGMTrans](https://github.com/vgmtrans/vgmtrans/) extrahiert wurden.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="426"/>
         <source>To be clear, this player is (currently) not intended to support all features in a MIDI or SoundFont file. If you want a more advanced MIDI player, consider try [QMidiPlayer](https://chrisoft.org/QMidiPlayer/) instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Um es deutlich zu machen, dieser Abspieler ist (derzeit) nicht dafür gedacht, alle Funktionen in einer MIDI- oder SoundFont-Datei zu unterstützen. Wenn Sie einen fortgeschritteneren MIDI-Abspieler wünschen, sollten Sie stattdessen [QMidiPlayer](https://chrisoft.org/QMidiPlayer/) ausprobieren.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="467"/>
@@ -212,7 +212,7 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="508"/>
         <source>Render to...</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendern nach ...</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="534"/>
