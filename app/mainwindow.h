@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Gary Wang <git@blumia.net>
+// SPDX-FileCopyrightText: 2025 Gary Wang <git@blumia.net>
 //
 // SPDX-License-Identifier: MIT
 
@@ -17,8 +17,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
 
     bool loadMidiFile(const QString & path);
     void loadSoundFontFile(const QString & path);

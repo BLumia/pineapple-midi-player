@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Gary Wang <git@blumia.net>
+// SPDX-FileCopyrightText: 2025 Gary Wang <git@blumia.net>
 //
 // SPDX-License-Identifier: MIT
 
@@ -93,8 +93,8 @@ MainWindow::MainWindow(QWidget *parent)
 #endif // HAVE_KIO
     });
 
-    connect(this, &MainWindow::soundfontLoaded, this, [this](const QString path){
-        QFileInfo fi(path);
+    connect(this, &MainWindow::soundfontLoaded, this, [this](const QString& path){
+        const QFileInfo fi(path);
         ui->soundFontFileLabel->setText(fi.fileName());
         m_currentSf2FilePath = path;
     });

@@ -63,6 +63,6 @@ The `CONAN2_STATIC_QT_BUG` option is required for Conan 2 build due to [this bug
 
 ## License
 
-Copyright &copy; 2024 [Gary Wang](https://github.com/BLumia/)
+Copyright &copy; 2025 [Gary Wang](https://github.com/BLumia/)
 
 Available under Expat/MIT License

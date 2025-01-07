@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Gary Wang <git@blumia.net>
+// SPDX-FileCopyrightText: 2025 Gary Wang <git@blumia.net>
 //
 // SPDX-License-Identifier: MIT
 
@@ -13,7 +13,7 @@
 #ifdef CONAN2_STATIC_QT_BUG
 #include <QtPlugin>
 Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin)
-#endif // CONAN2_STATIC_QT
+#endif // CONAN2_STATIC_QT_BUG
 
 int main(int argc, char *argv[])
 {
@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
 
     QTranslator translator;
     if (translator.load(QLocale(), QLatin1String("pineapple-midi-player"), QLatin1String("."), QLatin1String(":/i18n"))) {
-        a.installTranslator(&translator);
+        QApplication::installTranslator(&translator);
     }
-    a.setApplicationName("Pineapple MIDI Player");
-    a.setApplicationDisplayName(QCoreApplication::translate("main", "Pineapple MIDI Player"));
+    QApplication::setApplicationName("Pineapple MIDI Player");
+    QApplication::setApplicationDisplayName(QCoreApplication::translate("main", "Pineapple MIDI Player"));
 
     // parse commandline arguments
     QCommandLineParser parser;
@@ -45,5 +45,5 @@ int main(int argc, char *argv[])
         w.tryLoadFiles(urlList);
     }
 
-    return a.exec();
+    return QApplication::exec();
 }

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Gary Wang <git@blumia.net>
+// SPDX-FileCopyrightText: 2025 Gary Wang <git@blumia.net>
 //
 // SPDX-License-Identifier: MIT
 
@@ -12,7 +12,7 @@ class SeekableSlider : public QSlider
     Q_OBJECT
 public:
     explicit SeekableSlider(QWidget *parent = nullptr);
-    ~SeekableSlider() = default;
+    ~SeekableSlider() override = default;
 
 signals:
 
