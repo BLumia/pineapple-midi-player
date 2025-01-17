@@ -6,7 +6,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="20"/>
         <source>Pineapple MIDI Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Pineapple MIDI-Spieler</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="31"/>
@@ -111,7 +111,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="287"/>
         <source>Stay on Top</source>
-        <translation type="unfinished">Oben bleiben</translation>
+        <translation>Immer im Vordergrund</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="292"/>
@@ -222,7 +222,7 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="535"/>
         <source>Consider build against &lt;a href=&apos;https://invent.kde.org/frameworks/kio&apos;&gt;KIO&lt;/a&gt; to use this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erwäge, gegen &lt;a href=&apos;https://invent.kde.org/frameworks/kio&apos;&gt;KIO&lt;/a&gt; zu bauen, um diese Funktion zu nutzen.</translation>
     </message>
 </context>
 <context>
@@ -230,7 +230,7 @@
     <message>
         <location filename="../app/main.cpp" line="27"/>
         <source>Pineapple MIDI Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Pineapple MIDI-Spieler</translation>
     </message>
     <message>
         <location filename="../app/main.cpp" line="31"/>
