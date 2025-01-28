@@ -4,8 +4,7 @@
 #define STB_VORBIS_HEADER_ONLY
 #include "stb_vorbis.c"
 // https://github.com/schellingb/TinySoundFont
-// tsf.h revision: 3304b7f54ffad824f1eb011f462223f6645cd0fd (from PR #88 by nwhitehead)
-// tml.h revision: 92a8f0e9fe3c98358be7d8564db21fc4b1142d04
+// revision: 21f84301f8aea16e06c2cd2e777383a2aae71732
 #define TSF_IMPLEMENTATION
 #include "tsf.h"
 // TinyMidiLoader is a part of the TinySoundFont project
