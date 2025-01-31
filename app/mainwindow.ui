@@ -20,13 +20,25 @@
    <string>Pineapple MIDI Player</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-Debug/.qt/rcc/resources_qrc.qrc">
+   <iconset resource="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-RelWithDebInfo/.qt/rcc/resources_qrc.qrc">
     <normaloff>:/icons/assets/icons/app-icon.svg</normaloff>:/icons/assets/icons/app-icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="soundFontFileLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="text">
        <string>Drop SoundFont File here to load</string>
       </property>
@@ -34,6 +46,12 @@
     </item>
     <item>
      <widget class="QLabel" name="midiFileLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="text">
        <string>Drop MIDI File here to load</string>
       </property>
@@ -54,7 +72,7 @@
          <string notr="true">0:00</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -69,7 +87,7 @@
        <number>0</number>
       </property>
       <property name="orientation">
-       <enum>Qt::Orientation::Horizontal</enum>
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>
@@ -84,7 +102,7 @@
          <iconset theme="media-playback-start"/>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -97,7 +115,7 @@
          <iconset theme="media-playback-stop"/>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -107,14 +125,14 @@
          <string/>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -145,7 +163,7 @@
          <number>100</number>
         </property>
         <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -154,7 +172,7 @@
     <item>
      <widget class="QListView" name="playlistView">
       <property name="editTriggers">
-       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+       <set>QAbstractItemView::NoEditTriggers</set>
       </property>
      </widget>
     </item>
@@ -363,7 +381,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-Debug/.qt/rcc/resources_qrc.qrc"/>
+  <include location="../../build-pineapple-midi-player-Desktop_Qt_shared_MinGW_w64_UCRT64_MSYS2-RelWithDebInfo/.qt/rcc/resources_qrc.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::midiFileLoaded, this, [this](const QString path){
         QFileInfo fi(path);
         ui->midiFileLabel->setText(fi.fileName());
+        ui->midiFileLabel->setToolTip(fi.fileName());
         m_currentMidiFilePath = path;
 
         auto info = Player::instance()->midiInfo();
