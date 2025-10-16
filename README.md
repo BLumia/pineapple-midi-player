@@ -29,14 +29,15 @@ $ cmake --build . # or simply using `make` if you are using Makefile as the cmak
 <details>
 <summary>This method is a little bit tedious so...</summary>
 
-Conan can be used to build this project as well, but [PortAudio is still not available from Conan Center](https://github.com/conan-io/conan-center-index/issues/16335), so you will need to deal with the PortAudio dependency by yourself. You can either write a recipe/build the PortAudio Conan package by yourself, or use other method to ensure PortAudio can be found by CMake.
+By default, `conan profile detect` will generate a profile with `compiler.cppstd=14`, you will need to change it to or use a profile with `compiler.cppstd=17` in order to build Qt.
+
+[Conan Center doesn't have PortAudio package](https://github.com/conan-io/conan-center-index/issues/16335), so this project uses `FetchContent` to download and build it. You can manually build it and use the version that you manually built as well if preferred as long as `find_package` can find it.
 
 The following content can be saved to `conanfile.txt` for you to use:
 
 ```ini
 [requires]
-qt/6.7.1
-portaudio/master
+qt/6.8.3
 
 [generators]
 CMakeDeps

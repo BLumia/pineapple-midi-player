@@ -8,6 +8,7 @@ project(pineapple-midi-player
 # This is optional. Arch Linux's portaudio package doesn't have CMake support (for now).
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
+include(FetchContent)
 include(GNUInstallDirs)
 
 option(USE_KIO "Use KIO-based open-with action" ON)
@@ -20,7 +21,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 "6.4" REQUIRED COMPONENTS Widgets LinguistTools)
-find_package(PortAudio REQUIRED)
+
+FetchContent_Declare(
+    PortAudio
+    GIT_REPOSITORY https://github.com/PortAudio/portaudio.git
+    GIT_TAG        96dedbd860631f83155141030a07efc3813cfbd5
+)
+FetchContent_MakeAvailable(PortAudio)
 
 if(USE_KIO)
     find_package(ECM 6.0.0 NO_MODULE)
