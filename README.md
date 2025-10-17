@@ -1,6 +1,6 @@
 ## Summary
 
-Simple SoundFont MIDI player.
+Pineapple MIDI Player is a simple SoundFont MIDI player, designed to play simple MIDI file together with SoundFont file, especially MIDI files extracted by tools like [VGMTrans](https://github.com/vgmtrans/vgmtrans/). This tool will attempt to load the SoundFont with the same file name as the MIDI file by default, and support change SoundFont on-the-fly when dropping a SF2 file onto the main window.
 
 Based on the following projects:
 
@@ -61,6 +61,22 @@ $ cmake --build --preset conan-release
 The `CONAN2_STATIC_QT_BUG` option is required for Conan 2 build due to [this bug](https://github.com/conan-io/conan-center-index/issues/23045).
 
 </details>
+
+## Contribution
+
+Beside feedback and code contribution, other contributions are also welcome!
+
+### Help Translation!
+
+<a href="https://translate.codeberg.org/engage/pineapple-apps/">
+<img src="https://translate.codeberg.org/widget/pineapple-apps/pineapple-midi-player/287x66-grey.png" alt="Translation status" />
+</a>
+
+### Funding
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/blumia)
+
+[![Afdian](https://static.afdiancdn.com/static/img/logo/logo.png)Afdian](https://afdian.com/a/BLumia)
 
 ## License
 

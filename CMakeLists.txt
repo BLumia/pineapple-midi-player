@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.9.5)
+cmake_minimum_required(VERSION 3.22)
 
 project(pineapple-midi-player
-    VERSION 1.3.2
+    VERSION 1.4.0
     HOMEPAGE_URL "https://github.com/BLumia/pineapple-midi-player"
 )
 
@@ -79,6 +79,9 @@ qt_add_translations(${EXE_NAME}
 TS_FILES
     translations/pineapple-midi-player.ts
     translations/pineapple-midi-player.de.ts
+    translations/pineapple-midi-player.nl.ts
+    translations/pineapple-midi-player.pl.ts
+    translations/pineapple-midi-player.tr.ts
     translations/pineapple-midi-player.zh_CN.ts
 )
 

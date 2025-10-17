@@ -1,3 +1,4 @@
 build/
-*.user
+CMakeLists.txt.user*
 .DS_Store
+.cache/
