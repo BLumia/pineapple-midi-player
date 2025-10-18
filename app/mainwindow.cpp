@@ -463,7 +463,7 @@ SOFTWARE.
     connect(btn, &QPushButton::clicked, this, [this, &mitLicense](){
         QMessageBox licenseBox(this);
         licenseBox.setIcon(QMessageBox::Information);
-        licenseBox.setWindowTitle("License");
+        licenseBox.setWindowTitle(tr("License"));
         licenseBox.setText(mitLicense);
         licenseBox.setTextFormat(Qt::MarkdownText);
         licenseBox.exec();
@@ -490,7 +490,7 @@ SOFTWARE.
         "\n"
         "[Source Code](https://github.com/BLumia/pineapple-midi-player)\n"
         "\n"
-        "Copyright &copy; 2024 [BLumia](https://github.com/BLumia/)"
+        "Copyright &copy; 2025 [BLumia](https://github.com/BLumia/)"
     );
     infoBox.setTextFormat(Qt::MarkdownText);
     infoBox.exec();

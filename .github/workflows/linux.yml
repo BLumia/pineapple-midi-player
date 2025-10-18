@@ -28,7 +28,7 @@ jobs:
       - name: Build
         working-directory: ./
         run: |
-          cmake -B build .
+          cmake -B build -DFETCHCONTENT_FULLY_DISCONNECTED=ON .
           cmake --build build -j
       - name: Package
         env:
@@ -39,4 +39,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Linux-Build
-          path: "*.AppImage"
+          path: "Pineapple*.AppImage"
