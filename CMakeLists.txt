@@ -26,6 +26,7 @@ FetchContent_Declare(
     PortAudio
     GIT_REPOSITORY https://github.com/PortAudio/portaudio.git
     GIT_TAG        96dedbd860631f83155141030a07efc3813cfbd5
+    FIND_PACKAGE_ARGS
 )
 FetchContent_MakeAvailable(PortAudio)
 
