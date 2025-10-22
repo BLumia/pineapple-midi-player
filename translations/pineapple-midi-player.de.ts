@@ -207,7 +207,7 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="479"/>
         <source>Based on the following free software libraries:</source>
-        <translation>Basiert auf den folgenden freien Software-Bibliotheken:</translation>
+        <translation>Basiert auf den folgenden freien Programmbibliotheken:</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="508"/>
