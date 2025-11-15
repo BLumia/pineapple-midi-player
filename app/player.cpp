@@ -35,13 +35,29 @@ Player * Player::instance()
 
 void Player::play()
 {
-    PaError ret = Pa_IsStreamActive(m_stream);
-    if (ret == 0) {
-        fputs("Playback stream stopped, restarting...", stderr);
-        bool succ = setupAndStartStream();
-        if (!succ) {
-            fputs("Not able to restart playback stream", stderr);
+    if (!m_stream) {
+        if (!setupAndStartStream()) {
+            fputs("Not able to create playback stream\n", stderr);
             return;
+        }
+    } else {
+        PaError active = Pa_IsStreamActive(m_stream);
+        if (active == 0) {
+            fputs("Playback stream stopped, restarting...", stderr);
+            PaError err = Pa_StartStream(m_stream);
+            if (err != paNoError) {
+                fprintf(stderr, "Pa_StartStream failed: %s, reopening...\n", Pa_GetErrorText(err));
+                if (!setupAndStartStream()) {
+                    fputs("Not able to restart playback stream\n", stderr);
+                    return;
+                }
+            }
+        } else if (active < 0) {
+            fprintf(stderr, "Pa_IsStreamActive error: %s, reopening...\n", Pa_GetErrorText(active));
+            if (!setupAndStartStream()) {
+                fputs("Not able to restart playback stream\n", stderr);
+                return;
+            }
         }
     }
     m_isPlaying = true;
@@ -216,13 +232,30 @@ Player::Player()
 {
     m_opl = opl_create();
 
-    Pa_Initialize();
-    setupAndStartStream();
+    PaError initErr = Pa_Initialize();
+    if (initErr != paNoError) {
+        fprintf(stderr, "Pa_Initialize failed: %s\n", Pa_GetErrorText(initErr));
+    }
+    if (!setupAndStartStream()) {
+        fputs("Failed to open/start default audio stream.\n", stderr);
+    }
 }
 
 Player::~Player()
 {
-    Pa_StopStream(m_stream);
+    if (m_stream) {
+        PaError err = Pa_StopStream(m_stream);
+        if (err != paNoError) {
+            fprintf(stderr, "Pa_StopStream failed: %s\n", Pa_GetErrorText(err));
+        }
+        err = Pa_CloseStream(m_stream);
+        if (err != paNoError) {
+            fprintf(stderr, "Pa_CloseStream failed: %s\n", Pa_GetErrorText(err));
+        }
+        m_stream = nullptr;
+    }
+
+    Pa_Terminate();
 
     opl_destroy(m_opl);
 }
@@ -302,15 +335,29 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
 
 bool Player::setupAndStartStream()
 {
-    Pa_OpenDefaultStream(&m_stream, 0, 2, paFloat32, SAMPLE_RATE, paFramesPerBufferUnspecified,
-                         +[](const void *inputBuffer, void *outputBuffer,
-                             unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
-                             PaStreamCallbackFlags statusFlags, void *userData) -> int {
-                             return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
-                         }, this);
-    PaError err = Pa_StartStream(m_stream);
+    if (m_stream) {
+        Pa_StopStream(m_stream);
+        Pa_CloseStream(m_stream);
+        m_stream = nullptr;
+    }
+
+    PaError err = Pa_OpenDefaultStream(&m_stream, 0, 2, paFloat32, SAMPLE_RATE, paFramesPerBufferUnspecified,
+                                       +[](const void *inputBuffer, void *outputBuffer,
+                                           unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
+                                           PaStreamCallbackFlags statusFlags, void *userData) -> int {
+                                           return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
+                                       }, this);
     if (err != paNoError) {
-        // TODO: logging?
+        fprintf(stderr, "Pa_OpenDefaultStream failed: %s\n", Pa_GetErrorText(err));
+        m_stream = nullptr;
+        return false;
+    }
+
+    err = Pa_StartStream(m_stream);
+    if (err != paNoError) {
+        fprintf(stderr, "Pa_StartStream failed: %s\n", Pa_GetErrorText(err));
+        Pa_CloseStream(m_stream);
+        m_stream = nullptr;
         return false;
     }
     return true;
@@ -357,6 +404,6 @@ int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned
         std::fill(buffer, buffer + numFrames * 2, 0);
     }
 
-    return 0;
+    return paContinue;
 }
 

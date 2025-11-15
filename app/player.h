@@ -62,7 +62,7 @@ private:
     bool m_isPlaying = false;
     bool m_loop = true;
 
-    PaStream * m_stream;
+    PaStream * m_stream = nullptr;
     tml_message* m_tinyMidiLoader = NULL;
     tsf* m_tinySoundFont = NULL;
     opl_t* m_opl = NULL;
