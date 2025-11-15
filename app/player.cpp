@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <iostream>
 #include <fstream>
+#include <unordered_set>
 
 #include <portaudio.h>
 
@@ -15,6 +16,7 @@
 #include "tsf.h"
 #include "tml.h"
 #include "dr_wav.h"
+#include "midi_parser.h"
 
 #ifndef TSF_RENDER_EFFECTSAMPLEBLOCK
 #define TSF_RENDER_EFFECTSAMPLEBLOCK 64
@@ -112,17 +114,30 @@ void Player::setLoop(bool loop)
 
 std::map<Player::InfoType, std::variant<int, unsigned int> > Player::midiInfo() const
 {
-    int usedChannels, usedPrograms, totalNotes;
-    unsigned int timeFirstNoteMs, timeLengthMs;
-    tml_get_info(m_tinyMidiLoader, &usedChannels, &usedPrograms, &totalNotes, &timeFirstNoteMs, &timeLengthMs);
+    std::unordered_set<int> channels;
+    std::unordered_set<int> programs;
+    int totalNotes = 0;
+    unsigned int timeFirstNoteMs = 0;
+    bool firstFound = false;
+    unsigned int timeLengthMs = 0;
+
+    for (tml_message* Msg = m_tinyMidiLoader; Msg; Msg = Msg->next) {
+        timeLengthMs = Msg->time;
+        if (Msg->type == TML_PROGRAM_CHANGE) programs.insert((int)Msg->program);
+        if (Msg->type == TML_NOTE_ON) {
+            if (!firstFound) { timeFirstNoteMs = timeLengthMs; firstFound = true; }
+            channels.insert((int)Msg->channel);
+            totalNotes++;
+        }
+    }
+    if (!firstFound) timeFirstNoteMs = 0;
 
     std::map<Player::InfoType, std::variant<int, unsigned int>> info;
-    info[I_USED_CHANNELS] = usedChannels;
-    info[I_USED_PROGRAMS] = usedPrograms;
+    info[I_USED_CHANNELS] = (int)channels.size();
+    info[I_USED_PROGRAMS] = (int)programs.size();
     info[I_TOTAL_NOTES] = totalNotes;
     info[I_1ST_NOTE_MS] = timeFirstNoteMs;
     info[I_LENGTH_MS] = timeLengthMs;
-
     return info;
 }
 
@@ -138,7 +153,7 @@ bool Player::loadMidiFile(const char *filePath)
     stop();
 
     tml_message * oldFile = m_tinyMidiLoader;
-    m_tinyMidiLoader = tml_load_filename(filePath);
+    m_tinyMidiLoader = pmidi::MidiParser::parseFile(filePath);
     if (oldFile) tml_free(oldFile);
 
     if (!m_tinyMidiLoader) {
@@ -270,20 +285,20 @@ std::tuple<double, tml_message *> Player::oplRenderToBuffer(float *buffer, tml_m
 
     for (; curMsg && curMs >= curMsg->time; curMsg = curMsg->next) {
         switch (curMsg->type) {
-        case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
-            opl_midi_changeprog(m_opl, curMsg->channel, curMsg->program);
+        case TML_PROGRAM_CHANGE:
+            opl_midi_changeprog(m_opl, (curMsg->channel % 16), curMsg->program);
             break;
-        case TML_NOTE_ON: //play a note
-            opl_midi_noteon(m_opl, curMsg->channel, curMsg->key, curMsg->velocity);
+        case TML_NOTE_ON:
+            opl_midi_noteon(m_opl, (curMsg->channel % 16), curMsg->key, curMsg->velocity);
             break;
-        case TML_NOTE_OFF: //stop a note
-            opl_midi_noteoff(m_opl, curMsg->channel, curMsg->key);
+        case TML_NOTE_OFF:
+            opl_midi_noteoff(m_opl, (curMsg->channel % 16), curMsg->key);
             break;
-        case TML_PITCH_BEND: //pitch wheel modification
-            opl_midi_pitchwheel(m_opl, curMsg->channel, ( curMsg->pitch_bend - 8192 ) / 64 );
+        case TML_PITCH_BEND:
+            opl_midi_pitchwheel(m_opl, (curMsg->channel % 16), ( curMsg->pitch_bend - 8192 ) / 64 );
             break;
-        case TML_CONTROL_CHANGE: //MIDI controller messages
-            opl_midi_controller(m_opl, curMsg->channel, curMsg->control, curMsg->control_value );
+        case TML_CONTROL_CHANGE:
+            opl_midi_controller(m_opl, (curMsg->channel % 16), curMsg->control, curMsg->control_value );
             break;
         }
     }
@@ -309,8 +324,8 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
 
     for (; curMsg && curMs >= curMsg->time; curMsg = curMsg->next) {
         switch (curMsg->type) {
-        case TML_PROGRAM_CHANGE: //channel program (preset) change (special handling for 10th MIDI channel with drums)
-            tsf_channel_set_presetnumber(m_tinySoundFont, curMsg->channel, curMsg->program, (curMsg->channel == 9));
+        case TML_PROGRAM_CHANGE:
+            tsf_channel_set_presetnumber(m_tinySoundFont, curMsg->channel, curMsg->program, ((curMsg->channel % 16) == 9));
             break;
         case TML_NOTE_ON: //play a note
             tsf_channel_note_on(m_tinySoundFont, curMsg->channel, curMsg->key, curMsg->velocity / 127.0f);

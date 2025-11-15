@@ -73,6 +73,8 @@ PRIVATE
     libs/tml.h
     libs/opl.h
     libs/dr_wav.h
+    libs/midi_parser.h
+    libs/midi_parser.cpp
     libs/stb_vorbis.c
     libs/implements.c
 )
