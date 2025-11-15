@@ -75,6 +75,39 @@ void Settings::setFallbackSoundFont(const QString &path)
     m_qsettings->sync();
 }
 
+int Settings::audioDeviceIndex() const
+{
+    return m_qsettings->value("audio/device_index", -1).toInt();
+}
+
+int Settings::audioSampleRate() const
+{
+    return m_qsettings->value("audio/sample_rate", 44100).toInt();
+}
+
+int Settings::audioFramesPerBuffer() const
+{
+    return m_qsettings->value("audio/frames_per_buffer", 0).toInt();
+}
+
+void Settings::setAudioDeviceIndex(int index)
+{
+    m_qsettings->setValue("audio/device_index", index);
+    m_qsettings->sync();
+}
+
+void Settings::setAudioSampleRate(int rate)
+{
+    m_qsettings->setValue("audio/sample_rate", rate);
+    m_qsettings->sync();
+}
+
+void Settings::setAudioFramesPerBuffer(int frames)
+{
+    m_qsettings->setValue("audio/frames_per_buffer", frames);
+    m_qsettings->sync();
+}
+
 #if defined(FLAG_PORTABLE_MODE_SUPPORT) && defined(Q_OS_WIN)
 #include <windows.h>
 // QCoreApplication::applicationDirPath() parses the "applicationDirPath" from arg0, which...

@@ -58,6 +58,9 @@ PRIVATE
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
+    app/audiosettingsdialog.h
+    app/audiosettingsdialog.cpp
+    app/audiosettingsdialog.ui
     app/seekableslider.cpp
     app/seekableslider.h
     app/settings.cpp

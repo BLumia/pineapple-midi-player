@@ -16,10 +16,16 @@ public:
     bool stayOnTop() const;
     QString applicationStyle() const;
     QString fallbackSoundFont() const;
+    int audioDeviceIndex() const;
+    int audioSampleRate() const;
+    int audioFramesPerBuffer() const;
 
     void setStayOnTop(bool on);
     void setApplicationStyle(const QString & styleName);
     void setFallbackSoundFont(const QString & path);
+    void setAudioDeviceIndex(int index);
+    void setAudioSampleRate(int rate);
+    void setAudioFramesPerBuffer(int frames);
 
 private:
     Settings();

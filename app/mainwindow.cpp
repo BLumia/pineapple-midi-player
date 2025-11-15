@@ -7,6 +7,7 @@
 
 #include "player.h"
 #include "settings.h"
+#include "audiosettingsdialog.h"
 #include "playlistmanager.h"
 
 #ifdef Q_OS_WIN
@@ -60,6 +61,18 @@ MainWindow::MainWindow(QWidget *parent)
     updateFallbackSoundFontAction(Settings::instance()->fallbackSoundFont());
 
     connect(ui->actionFallbackSoundFont, &QAction::triggered, this, &MainWindow::loadSpecificSoundFontActionTriggered);
+
+    {
+        Player::AudioSettings s;
+        s.deviceIndex = Settings::instance()->audioDeviceIndex();
+        s.sampleRate = Settings::instance()->audioSampleRate();
+        s.framesPerBuffer = (unsigned long)Settings::instance()->audioFramesPerBuffer();
+        s.channels = 2;
+        s.suggestedLatency = 0.0;
+        if (s.deviceIndex != -1 || s.sampleRate != 44100 || s.framesPerBuffer != 0) {
+            Player::instance()->applyAudioSettings(s);
+        }
+    }
 
     m_playbackUiTimer = new QTimer(this);
     m_playbackUiTimer->setInterval(33);
@@ -502,6 +515,12 @@ SOFTWARE.
     );
     infoBox.setTextFormat(Qt::MarkdownText);
     infoBox.exec();
+}
+
+void MainWindow::on_actionAudioSettings_triggered()
+{
+    AudioSettingsDialog dlg(this);
+    dlg.exec();
 }
 
 void MainWindow::on_actionRepeat_triggered()

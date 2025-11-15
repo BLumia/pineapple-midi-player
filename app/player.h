@@ -8,6 +8,8 @@
 #include <variant>
 #include <functional>
 #include <atomic>
+#include <string>
+#include <vector>
 
 #include "tsf.h"
 #include "opl.h"
@@ -17,6 +19,25 @@ typedef void PaStream;
 class Player
 {
 public:
+    struct AudioSettings {
+        int deviceIndex = -1;
+        int sampleRate = 44100;
+        int channels = 2;
+        unsigned long framesPerBuffer = 0; // 0 = unspecified/auto
+        double suggestedLatency = 0.0; // 0 = use device default
+    };
+
+    struct DeviceInfo {
+        int index = -1;
+        std::string name;
+        std::string hostApi;
+        int maxOutputChannels = 0;
+        double defaultSampleRate = 0.0;
+        double defaultLowLatency = 0.0;
+        double defaultHighLatency = 0.0;
+        bool isDefaultOutput = false;
+    };
+
     enum InfoType {
         I_USED_CHANNELS,
         I_USED_PROGRAMS,
@@ -38,6 +59,9 @@ public:
     void setLoop(bool loop);
     std::map<enum InfoType, std::variant<int, unsigned int> > midiInfo() const;
     unsigned int currentPlaybackPositionMs() const;
+    AudioSettings currentAudioSettings() const;
+    std::vector<DeviceInfo> enumerateOutputDevices() const;
+    bool applyAudioSettings(const AudioSettings &settings);
 
     void setVolume(float volume);
 
@@ -65,6 +89,7 @@ private:
     std::atomic<bool> m_loop{true};
 
     PaStream * m_stream = nullptr;
+    AudioSettings m_audioSettings;
     tml_message* m_tinyMidiLoader = NULL;
     tsf* m_tinySoundFont = NULL;
     opl_t* m_opl = NULL;

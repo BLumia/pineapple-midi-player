@@ -166,7 +166,8 @@ bool Player::loadSF2File(const char *sf2Path)
     tsf_channel_set_bank_preset(m_tinySoundFont, 9, 128, 0);
 
     // Set the SoundFont rendering output mode
-    tsf_set_output(m_tinySoundFont, TSF_STEREO_INTERLEAVED, SAMPLE_RATE, 0.0f);
+    int sr = (m_audioSettings.sampleRate > 0) ? m_audioSettings.sampleRate : SAMPLE_RATE;
+    tsf_set_output(m_tinySoundFont, TSF_STEREO_INTERLEAVED, sr, 0.0f);
 
     // Init volume
     tsf_set_volume(m_tinySoundFont, m_volume);
@@ -237,7 +238,7 @@ Player::Player()
         fprintf(stderr, "Pa_Initialize failed: %s\n", Pa_GetErrorText(initErr));
     }
     if (!setupAndStartStream()) {
-        fputs("Failed to open/start default audio stream.\n", stderr);
+        fputs("Failed to open/start audio stream.\n", stderr);
     }
 }
 
@@ -262,7 +263,8 @@ Player::~Player()
 
 std::tuple<double, tml_message *> Player::oplRenderToBuffer(float *buffer, tml_message *startMsg, double startMs, int sampleCount)
 {
-    const double playbackEnd = startMs + (sampleCount * (1000.0 / SAMPLE_RATE));
+    const double sr = (m_audioSettings.sampleRate > 0) ? (double)m_audioSettings.sampleRate : (double)SAMPLE_RATE;
+    const double playbackEnd = startMs + (sampleCount * (1000.0 / sr));
     double curMs = startMs;
     tml_message * curMsg = startMsg;
 
@@ -300,7 +302,8 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
 {
     if (!m_tinySoundFont) return oplRenderToBuffer(buffer, startMsg, startMs, sampleCount);
 
-    const double playbackEnd = startMs + (sampleCount * (1000.0 / SAMPLE_RATE));
+    const double sr = (m_audioSettings.sampleRate > 0) ? (double)m_audioSettings.sampleRate : (double)SAMPLE_RATE;
+    const double playbackEnd = startMs + (sampleCount * (1000.0 / sr));
     double curMs = startMs;
     tml_message * curMsg = startMsg;
 
@@ -335,6 +338,55 @@ unsigned int Player::currentPlaybackPositionMs() const
     return m_uiPlaybackMs.load();
 }
 
+Player::AudioSettings Player::currentAudioSettings() const
+{
+    return m_audioSettings;
+}
+
+std::vector<Player::DeviceInfo> Player::enumerateOutputDevices() const
+{
+    std::vector<DeviceInfo> list;
+    int count = Pa_GetDeviceCount();
+    if (count < 0) return list;
+    int defaultIndex = Pa_GetDefaultOutputDevice();
+    for (int i = 0; i < count; ++i) {
+        const PaDeviceInfo *info = Pa_GetDeviceInfo(i);
+        if (!info) continue;
+        if (info->maxOutputChannels <= 0) continue;
+        const PaHostApiInfo *api = Pa_GetHostApiInfo(info->hostApi);
+        DeviceInfo di;
+        di.index = i;
+        di.name = info->name ? info->name : "";
+        di.hostApi = api ? (api->name ? api->name : "") : "";
+        di.maxOutputChannels = info->maxOutputChannels;
+        di.defaultSampleRate = info->defaultSampleRate;
+        di.defaultLowLatency = info->defaultLowOutputLatency;
+        di.defaultHighLatency = info->defaultHighOutputLatency;
+        di.isDefaultOutput = (i == defaultIndex);
+        list.push_back(std::move(di));
+    }
+    return list;
+}
+
+bool Player::applyAudioSettings(const AudioSettings &settings)
+{
+    fprintf(stderr, "Apply audio settings: device=%d, sr=%d, ch=%d, fpb=%lu\n",
+            settings.deviceIndex, settings.sampleRate, settings.channels, settings.framesPerBuffer);
+    bool wasPlaying = m_isPlaying.load();
+    m_audioSettings = settings;
+    if (!setupAndStartStream()) {
+        fprintf(stderr, "Apply audio settings failed, stream rebuild failed.\n");
+        return false;
+    }
+    if (m_tinySoundFont) {
+        int sr = (m_audioSettings.sampleRate > 0) ? m_audioSettings.sampleRate : SAMPLE_RATE;
+        tsf_set_output(m_tinySoundFont, TSF_STEREO_INTERLEAVED, sr, 0.0f);
+        fprintf(stderr, "TSF output reconfigured to sr=%d\n", sr);
+    }
+    m_isPlaying.store(wasPlaying);
+    return true;
+}
+
 bool Player::setupAndStartStream()
 {
     if (m_stream) {
@@ -343,17 +395,55 @@ bool Player::setupAndStartStream()
         m_stream = nullptr;
     }
 
-    PaError err = Pa_OpenDefaultStream(&m_stream, 0, 2, paFloat32, SAMPLE_RATE, paFramesPerBufferUnspecified,
-                                       +[](const void *inputBuffer, void *outputBuffer,
-                                           unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
-                                           PaStreamCallbackFlags statusFlags, void *userData) -> int {
-                                           return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
-                                       }, this);
+    PaStreamParameters outParams{};
+    outParams.device = (m_audioSettings.deviceIndex >= 0) ? m_audioSettings.deviceIndex : Pa_GetDefaultOutputDevice();
+    const PaDeviceInfo *devInfo = Pa_GetDeviceInfo(outParams.device);
+    if (!devInfo) {
+        fprintf(stderr, "Invalid output device index: %d\n", outParams.device);
+        return false;
+    }
+    outParams.channelCount = m_audioSettings.channels;
+    outParams.sampleFormat = paFloat32;
+    outParams.suggestedLatency = (m_audioSettings.suggestedLatency > 0.0)
+                                 ? m_audioSettings.suggestedLatency
+                                 : devInfo->defaultLowOutputLatency;
+    outParams.hostApiSpecificStreamInfo = nullptr;
+
+    double sr = (m_audioSettings.sampleRate > 0) ? (double)m_audioSettings.sampleRate : devInfo->defaultSampleRate;
+    PaError err = Pa_IsFormatSupported(nullptr, &outParams, sr);
+    if (err != paFormatIsSupported) {
+        fprintf(stderr, "Format not supported: device=%d (%s), ch=%d, sr=%.2f\n",
+                outParams.device, devInfo->name ? devInfo->name : "?",
+                outParams.channelCount, sr);
+        return false;
+    }
+
+    fprintf(stderr, "Opening stream: device=%d (%s), host=%s, ch=%d, sr=%.2f, fpb=%lu\n",
+            outParams.device,
+            devInfo->name ? devInfo->name : "?",
+            Pa_GetHostApiInfo(devInfo->hostApi) ? Pa_GetHostApiInfo(devInfo->hostApi)->name : "?",
+            outParams.channelCount, sr,
+            (m_audioSettings.framesPerBuffer == 0) ? paFramesPerBufferUnspecified : m_audioSettings.framesPerBuffer);
+
+    err = Pa_OpenStream(&m_stream,
+                        nullptr,
+                        &outParams,
+                        sr,
+                        (m_audioSettings.framesPerBuffer == 0) ? paFramesPerBufferUnspecified : m_audioSettings.framesPerBuffer,
+                        paNoFlag,
+                        +[](const void *inputBuffer, void *outputBuffer,
+                            unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
+                            PaStreamCallbackFlags statusFlags, void *userData) -> int {
+                            return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
+                        }, this);
     if (err != paNoError) {
-        fprintf(stderr, "Pa_OpenDefaultStream failed: %s\n", Pa_GetErrorText(err));
+        fprintf(stderr, "Pa_OpenStream failed: %s\n", Pa_GetErrorText(err));
         m_stream = nullptr;
         return false;
     }
+
+    // sync chosen sr back to settings to keep TSF/render in sync
+    m_audioSettings.sampleRate = static_cast<int>(sr);
 
     err = Pa_StartStream(m_stream);
     if (err != paNoError) {
@@ -362,6 +452,7 @@ bool Player::setupAndStartStream()
         m_stream = nullptr;
         return false;
     }
+    fprintf(stderr, "Stream started successfully.\n");
     return true;
 }
 
