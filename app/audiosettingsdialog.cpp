@@ -24,13 +24,14 @@ AudioSettingsDialog::AudioSettingsDialog(QWidget *parent)
 void AudioSettingsDialog::populateDevices()
 {
     ui->deviceCombo->clear();
+    ui->deviceCombo->addItem(tr("Auto"), -1);
     const auto devices = Player::instance()->enumerateOutputDevices();
     int currentIndex = -1;
     const auto cur = Player::instance()->currentAudioSettings();
     for (const auto &d : devices) {
         const QString text = QString::fromStdString(d.name) + QStringLiteral(" (") + QString::fromStdString(d.hostApi) + QStringLiteral(")");
         ui->deviceCombo->addItem(text, d.index);
-        if (d.index == cur.deviceIndex || (cur.deviceIndex < 0 && d.isDefaultOutput)) {
+        if (d.index == cur.deviceIndex) {
             currentIndex = ui->deviceCombo->count() - 1;
         }
     }
