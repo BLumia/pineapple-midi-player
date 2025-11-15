@@ -7,6 +7,7 @@
 #include <map>
 #include <variant>
 #include <functional>
+#include <atomic>
 
 #include "tsf.h"
 #include "opl.h"
@@ -36,6 +37,7 @@ public:
     bool loop() const;
     void setLoop(bool loop);
     std::map<enum InfoType, std::variant<int, unsigned int> > midiInfo() const;
+    unsigned int currentPlaybackPositionMs() const;
 
     void setVolume(float volume);
 
@@ -59,8 +61,8 @@ private:
     int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames);
 
     float m_volume = 1;
-    bool m_isPlaying = false;
-    bool m_loop = true;
+    std::atomic<bool> m_isPlaying{false};
+    std::atomic<bool> m_loop{true};
 
     PaStream * m_stream = nullptr;
     tml_message* m_tinyMidiLoader = NULL;
@@ -68,8 +70,9 @@ private:
     opl_t* m_opl = NULL;
     tml_message* m_currentPlaybackMessagePos;
     double m_currentPlaybackMSec = 0;
-    tml_message* m_seekToMessagePos = NULL;
-    double m_seekToMSec = 0;
+    std::atomic<tml_message*> m_seekToMessagePos{NULL};
+    std::atomic<unsigned int> m_seekToMSec{0};
+    std::atomic<unsigned int> m_uiPlaybackMs{0};
     std::function<void(unsigned int)> mf_playbackCallback;
     std::function<void(bool)> mf_onIsPlayingChanged;
 };

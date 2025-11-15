@@ -60,13 +60,13 @@ void Player::play()
             }
         }
     }
-    m_isPlaying = true;
+    m_isPlaying.store(true);
     if (mf_onIsPlayingChanged) mf_onIsPlayingChanged(m_isPlaying);
 }
 
 void Player::pause()
 {
-    m_isPlaying = false;
+    m_isPlaying.store(false);
     if (mf_onIsPlayingChanged) mf_onIsPlayingChanged(m_isPlaying);
 }
 
@@ -82,7 +82,7 @@ void Player::stop()
 
 bool Player::isPlaying() const
 {
-    return m_isPlaying;
+    return m_isPlaying.load();
 }
 
 void Player::seekTo(unsigned int ms)
@@ -90,24 +90,24 @@ void Player::seekTo(unsigned int ms)
     if (m_tinyMidiLoader) {
         opl_clear(m_opl);
         if (m_tinySoundFont) tsf_note_off_all(m_tinySoundFont);
-        m_seekToMSec = ms;
+        m_seekToMSec.store(ms);
         tml_message* search = m_tinyMidiLoader;
         while (search->next) {
             if (search->time > ms) break;
             search = search->next;
         }
-        m_seekToMessagePos = search;
+        m_seekToMessagePos.store(search);
     }
 }
 
 bool Player::loop() const
 {
-    return m_loop;
+    return m_loop.load();
 }
 
 void Player::setLoop(bool loop)
 {
-    m_loop = loop;
+    m_loop.store(loop);
 }
 
 std::map<Player::InfoType, std::variant<int, unsigned int> > Player::midiInfo() const
@@ -287,14 +287,11 @@ std::tuple<double, tml_message *> Player::oplRenderToBuffer(float *buffer, tml_m
     }
 
     // Render the block of audio samples in float format
-    int len = sampleCount * 2 * sizeof(short);
-    void * tmpBuffer = malloc(len);
-    short * shortBuffer = (short *)tmpBuffer;
+    short shortBuffer[TSF_RENDER_EFFECTSAMPLEBLOCK * 2];
     opl_render( m_opl, shortBuffer, sampleCount, 1 );
     for (int i = 0; i < sampleCount * 2; i++) {
         buffer[i] = (float) shortBuffer[i] / 32768.0f;
     }
-    free(tmpBuffer);
 
     return std::make_tuple(playbackEnd, curMsg);
 }
@@ -333,6 +330,11 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
     return std::make_tuple(playbackEnd, curMsg);
 }
 
+unsigned int Player::currentPlaybackPositionMs() const
+{
+    return m_uiPlaybackMs.load();
+}
+
 bool Player::setupAndStartStream()
 {
     if (m_stream) {
@@ -365,14 +367,14 @@ bool Player::setupAndStartStream()
 
 int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames)
 {
-    if (m_tinyMidiLoader && m_isPlaying) {
+    if (m_tinyMidiLoader && m_isPlaying.load()) {
         std::uint8_t * buffer = (std::uint8_t *)outputBuffer;
         // Check and apply seek
-        if (m_seekToMessagePos) {
-            m_currentPlaybackMessagePos = m_seekToMessagePos;
-            m_seekToMessagePos = NULL;
-            m_currentPlaybackMSec = m_seekToMSec;
-            m_seekToMSec = 0;
+        if (m_seekToMessagePos.load() != NULL) {
+            tml_message* target = m_seekToMessagePos.exchange(NULL);
+            unsigned int targetMs = m_seekToMSec.exchange(0);
+            m_currentPlaybackMessagePos = target;
+            m_currentPlaybackMSec = (double)targetMs;
         }
 
         //Number of samples to process
@@ -391,14 +393,11 @@ int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned
         if (!m_currentPlaybackMessagePos) {
             m_currentPlaybackMSec = 0;
             m_currentPlaybackMessagePos = m_tinyMidiLoader;
-            if (!m_loop) {
-                pause();
+            if (!m_loop.load()) {
+                m_isPlaying.store(false);
             }
         }
-
-        if (mf_playbackCallback) {
-            mf_playbackCallback(m_currentPlaybackMSec);
-        }
+        m_uiPlaybackMs.store((unsigned int)m_currentPlaybackMSec);
     } else {
         float* buffer = (float*)outputBuffer;
         std::fill(buffer, buffer + numFrames * 2, 0);

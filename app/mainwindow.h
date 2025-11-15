@@ -12,6 +12,7 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class PlaylistManager;
+class QTimer;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -72,6 +73,7 @@ private:
     QMenu *m_detectedSoundfontsMenu;
     QMenu *m_themes;
     PlaylistManager *m_playlistManager;
+    QTimer *m_playbackUiTimer = nullptr;
 
     Ui::MainWindow *ui;
 };

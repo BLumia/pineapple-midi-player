@@ -61,12 +61,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionFallbackSoundFont, &QAction::triggered, this, &MainWindow::loadSpecificSoundFontActionTriggered);
 
-    Player::instance()->setPlaybackCallback(std::bind(&MainWindow::playerPlaybackCallback, this, std::placeholders::_1));
+    m_playbackUiTimer = new QTimer(this);
+    m_playbackUiTimer->setInterval(33);
+    connect(m_playbackUiTimer, &QTimer::timeout, this, [this]() {
+        playerPlaybackCallback(Player::instance()->currentPlaybackPositionMs());
+    });
+
     Player::instance()->onIsPlayingChanged([this](bool isPlaying){
         ui->playBtn->setText(isPlaying ? QCoreApplication::translate("MainWindow", "Pause")
                                        : QCoreApplication::translate("MainWindow", "Play"));
         ui->playBtn->setIcon(isPlaying ? QIcon::fromTheme("media-playback-pause")
                                        : QIcon::fromTheme("media-playback-start"));
+        if (m_playbackUiTimer) {
+            isPlaying ? m_playbackUiTimer->start() : m_playbackUiTimer->stop();
+        }
     });
 
     connect(this, &MainWindow::midiFileLoaded, this, [this](const QString path){
