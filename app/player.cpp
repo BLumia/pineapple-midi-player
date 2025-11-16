@@ -151,6 +151,15 @@ bool Player::loadMidiFile(const char *filePath)
 {
     stop();
 
+    if (m_tinySoundFont) {
+        // Just in case other MIDI file might already channel parameters via e.g. PROGRAM_CHANGE event,
+        // let's do a full state reset here but keep the loaded SoundFont.
+        tsf_reset(m_tinySoundFont);
+        // Re-do the default bank preset for percussion since we just reset the full state which include
+        // channel state.
+        tsf_channel_set_bank_preset(m_tinySoundFont, 9, 128, 0);
+    }
+
     tml_message * oldFile = m_tinyMidiLoader;
     m_meta = pmidi::MetaBundle();
     m_tinyMidiLoader = pmidi::MidiParser::parseFile(filePath, &m_meta);
