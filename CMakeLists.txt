@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(pineapple-midi-player
-    VERSION 1.4.0
+    VERSION 2.0.0
     HOMEPAGE_URL "https://github.com/BLumia/pineapple-midi-player"
 )
 
