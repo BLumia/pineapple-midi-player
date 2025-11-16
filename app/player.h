@@ -13,7 +13,7 @@
 
 #include "tsf.h"
 #include "opl.h"
-#include "tml.h"
+#include "midi_parser.h"
 
 typedef void PaStream;
 class Player
@@ -58,6 +58,7 @@ public:
     bool loop() const;
     void setLoop(bool loop);
     std::map<enum InfoType, std::variant<int, unsigned int> > midiInfo() const;
+    const pmidi::MetaBundle& midiMeta() const;
     unsigned int currentPlaybackPositionMs() const;
     AudioSettings currentAudioSettings() const;
     std::vector<DeviceInfo> enumerateOutputDevices() const;
@@ -91,6 +92,7 @@ private:
     PaStream * m_stream = nullptr;
     AudioSettings m_audioSettings;
     tml_message* m_tinyMidiLoader = NULL;
+    pmidi::MetaBundle m_meta;
     tsf* m_tinySoundFont = NULL;
     opl_t* m_opl = NULL;
     tml_message* m_currentPlaybackMessagePos;

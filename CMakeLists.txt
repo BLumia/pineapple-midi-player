@@ -70,7 +70,6 @@ PRIVATE
 
     # vendored libs
     libs/tsf.h
-    libs/tml.h
     libs/opl.h
     libs/dr_wav.h
     libs/midi_parser.h

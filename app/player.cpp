@@ -14,7 +14,6 @@
 
 #include "opl.h"
 #include "tsf.h"
-#include "tml.h"
 #include "dr_wav.h"
 #include "midi_parser.h"
 
@@ -123,8 +122,8 @@ std::map<Player::InfoType, std::variant<int, unsigned int> > Player::midiInfo() 
 
     for (tml_message* Msg = m_tinyMidiLoader; Msg; Msg = Msg->next) {
         timeLengthMs = Msg->time;
-        if (Msg->type == TML_PROGRAM_CHANGE) programs.insert((int)Msg->program);
-        if (Msg->type == TML_NOTE_ON) {
+        if (Msg->type == pmidi::E_PROGRAM_CHANGE) programs.insert((int)Msg->program);
+        if (Msg->type == pmidi::E_NOTE_ON) {
             if (!firstFound) { timeFirstNoteMs = timeLengthMs; firstFound = true; }
             channels.insert((int)Msg->channel);
             totalNotes++;
@@ -153,7 +152,8 @@ bool Player::loadMidiFile(const char *filePath)
     stop();
 
     tml_message * oldFile = m_tinyMidiLoader;
-    m_tinyMidiLoader = pmidi::MidiParser::parseFile(filePath);
+    m_meta = pmidi::MetaBundle();
+    m_tinyMidiLoader = pmidi::MidiParser::parseFile(filePath, &m_meta);
     if (oldFile) tml_free(oldFile);
 
     if (!m_tinyMidiLoader) {
@@ -163,6 +163,11 @@ bool Player::loadMidiFile(const char *filePath)
 
     m_currentPlaybackMessagePos = m_tinyMidiLoader;
     return true;
+}
+
+const pmidi::MetaBundle& Player::midiMeta() const
+{
+    return m_meta;
 }
 
 bool Player::loadSF2File(const char *sf2Path)
@@ -285,19 +290,19 @@ std::tuple<double, tml_message *> Player::oplRenderToBuffer(float *buffer, tml_m
 
     for (; curMsg && curMs >= curMsg->time; curMsg = curMsg->next) {
         switch (curMsg->type) {
-        case TML_PROGRAM_CHANGE:
+        case pmidi::E_PROGRAM_CHANGE:
             opl_midi_changeprog(m_opl, (curMsg->channel % 16), curMsg->program);
             break;
-        case TML_NOTE_ON:
+        case pmidi::E_NOTE_ON:
             opl_midi_noteon(m_opl, (curMsg->channel % 16), curMsg->key, curMsg->velocity);
             break;
-        case TML_NOTE_OFF:
+        case pmidi::E_NOTE_OFF:
             opl_midi_noteoff(m_opl, (curMsg->channel % 16), curMsg->key);
             break;
-        case TML_PITCH_BEND:
+        case pmidi::E_PITCH_BEND:
             opl_midi_pitchwheel(m_opl, (curMsg->channel % 16), ( curMsg->pitch_bend - 8192 ) / 64 );
             break;
-        case TML_CONTROL_CHANGE:
+        case pmidi::E_CONTROL_CHANGE:
             opl_midi_controller(m_opl, (curMsg->channel % 16), curMsg->control, curMsg->control_value );
             break;
         }
@@ -324,19 +329,19 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
 
     for (; curMsg && curMs >= curMsg->time; curMsg = curMsg->next) {
         switch (curMsg->type) {
-        case TML_PROGRAM_CHANGE:
+        case pmidi::E_PROGRAM_CHANGE:
             tsf_channel_set_presetnumber(m_tinySoundFont, curMsg->channel, curMsg->program, ((curMsg->channel % 16) == 9));
             break;
-        case TML_NOTE_ON: //play a note
+        case pmidi::E_NOTE_ON: //play a note
             tsf_channel_note_on(m_tinySoundFont, curMsg->channel, curMsg->key, curMsg->velocity / 127.0f);
             break;
-        case TML_NOTE_OFF: //stop a note
+        case pmidi::E_NOTE_OFF: //stop a note
             tsf_channel_note_off(m_tinySoundFont, curMsg->channel, curMsg->key);
             break;
-        case TML_PITCH_BEND: //pitch wheel modification
+        case pmidi::E_PITCH_BEND: //pitch wheel modification
             tsf_channel_set_pitchwheel(m_tinySoundFont, curMsg->channel, curMsg->pitch_bend);
             break;
-        case TML_CONTROL_CHANGE: //MIDI controller messages
+        case pmidi::E_CONTROL_CHANGE: //MIDI controller messages
             tsf_channel_midi_control(m_tinySoundFont, curMsg->channel, curMsg->control, curMsg->control_value);
             break;
         }

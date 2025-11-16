@@ -28,7 +28,9 @@ struct TrackCtx {
     uint8_t current_port;
 };
 
-static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int division, MidiSong& song) {
+static std::string bytes_to_string(const uint8_t* p, int len) { return std::string((const char*)p, (size_t)len); }
+
+static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int division, MidiSong& song, MetaBundle* meta) {
     int off = 14;
     song.division = division;
     song.events.clear();
@@ -42,9 +44,10 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
         off += 8;
         if (off + track_len > (int)file.size()) break;
         TrackCtx ctx{&file[off], track_len, 0, 0, 0, 0};
+        if (meta) { if ((int)meta->tracks.size() < t+1) meta->tracks.resize(t+1); }
         while (ctx.off < ctx.size) {
             int dt = read_vlq(ctx.data, ctx.size, ctx.off);
-            if (dt < 0) break;
+            if (dt < 0) { /* malformed VLQ */ break; }
             ctx.ticks += (uint32_t)dt;
             if (ctx.off >= ctx.size) break;
             int status = ctx.data[ctx.off++];
@@ -57,21 +60,39 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
                 if (ctx.off >= ctx.size) break;
                 int meta_type = ctx.data[ctx.off++];
                 int len = read_vlq(ctx.data, ctx.size, ctx.off);
-                if (len < 0 || ctx.off + len > ctx.size) break;
-                const uint8_t* meta = ctx.data + ctx.off;
-                if (meta_type == 0x51 && len == 3) {
-                    uint32_t tempo = (uint32_t)meta[0]<<16 | (uint32_t)meta[1]<<8 | (uint32_t)meta[2];
+                if (len < 0 || ctx.off + len > ctx.size) { /* invalid meta length */ break; }
+                const uint8_t* metadata = ctx.data + ctx.off;
+                if (meta_type == ME_TEMPO && len == 3) {
+                    uint32_t tempo = (uint32_t)metadata[0]<<16 | (uint32_t)metadata[1]<<8 | (uint32_t)metadata[2];
                     song.tempo_ticks.push_back(ctx.ticks);
                     song.tempo_values.push_back(tempo);
-                } else if (meta_type == 0x21 && len == 1) {
-                    ctx.current_port = meta[0];
+                } else if (meta_type == ME_MIDI_PORT && len == 1) {
+                    ctx.current_port = metadata[0];
+                } else if (meta && meta_type == ME_TRACK_NAME) {
+                    meta->tracks[t].name = bytes_to_string(metadata, len);
+                } else if (meta && meta_type == ME_INSTRUMENT_NAME) {
+                    meta->tracks[t].instrument = bytes_to_string(metadata, len);
+                } else if (meta && meta_type == ME_MARKER) {
+                    meta->markers.emplace_back(ctx.ticks, bytes_to_string(metadata, len));
+                } else if (meta && meta_type == ME_LYRIC) {
+                    meta->lyrics.emplace_back(ctx.ticks, bytes_to_string(metadata, len));
+                } else if (meta && meta_type == ME_COPYRIGHT) {
+                    meta->copyright = bytes_to_string(metadata, len);
+                } else if (meta && meta_type == ME_TIME_SIGNATURE && len >= 4) {
+                    meta->timesig_n = metadata[0];
+                    meta->timesig_d_exp = metadata[1];
+                    meta->timesig_clocks = metadata[2];
+                    meta->timesig_thirtyseconds = metadata[3];
+                } else if (meta && meta_type == ME_KEY_SIGNATURE && len >= 2) {
+                    meta->keysig = (int8_t)metadata[0];
+                    meta->keysig_mode = metadata[1];
                 }
                 ctx.off += len;
                 continue;
             }
             if (status == 0xF0 || status == 0xF7) {
                 int len = read_vlq(ctx.data, ctx.size, ctx.off);
-                if (len < 0 || ctx.off + len > ctx.size) break;
+                if (len < 0 || ctx.off + len > ctx.size) { /* invalid sysex length */ break; }
                 ctx.off += len;
                 continue;
             }
@@ -80,27 +101,27 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
             param1 = ctx.data[ctx.off++] & 0x7F;
             uint8_t type = (uint8_t)(status & 0xF0);
             uint8_t ch = (uint8_t)(status & 0x0F);
-            uint8_t mapped_ch = (uint8_t)((ctx.current_port << 4) + ch);
+            uint16_t mapped_ch = (uint16_t)(((uint16_t)ctx.current_port << 4) + ch);
             MidiEventRaw ev{};
             ev.tick = ctx.ticks;
             ev.type = type;
             ev.channel = mapped_ch;
-            if (type == TML_PITCH_BEND) {
+            if (type == E_PITCH_BEND) {
                 if (ctx.off >= ctx.size) break;
                 param2 = ctx.data[ctx.off++] & 0x7F;
                 ev.key = (uint8_t)param1;
                 ev.pitch_bend = (uint16_t)(((param2 & 0x7F) << 7) | (param1 & 0x7F));
                 song.events.push_back(ev);
-            } else if (type == TML_PROGRAM_CHANGE || type == TML_CHANNEL_PRESSURE) {
+            } else if (type == E_PROGRAM_CHANGE || type == E_CHANNEL_PRESSURE) {
                 ev.key = (uint8_t)param1;
                 ev.velocity = 0;
                 song.events.push_back(ev);
-            } else if (type == TML_NOTE_ON || type == TML_NOTE_OFF || type == TML_KEY_PRESSURE || type == TML_CONTROL_CHANGE) {
+            } else if (type == E_NOTE_ON || type == E_NOTE_OFF || type == E_POLYPHONIC_KEY_PRESSURE || type == E_CONTROL_CHANGE) {
                 if (ctx.off >= ctx.size) break;
                 param2 = ctx.data[ctx.off++] & 0x7F;
                 ev.key = (uint8_t)param1;
                 ev.velocity = (uint8_t)param2;
-                if (type == TML_CONTROL_CHANGE) { ev.control = ev.key; ev.control_value = ev.velocity; }
+                if (type == E_CONTROL_CHANGE) { ev.control = ev.key; ev.control_value = ev.velocity; }
                 song.events.push_back(ev);
             } else {
             }
@@ -109,7 +130,22 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
     }
 }
 
-static tml_message* build_messages(const MidiSong& song) {
+static int tick_to_ms(const MidiSong& song, uint32_t tick) {
+    double ticks2time = 500000.0 / (1000.0 * song.division);
+    uint32_t tempo_ticks = 0;
+    int tempo_msec = 0;
+    for (size_t i = 0; i < song.tempo_ticks.size(); ++i) {
+        if (song.tempo_ticks[i] > tick) break;
+        int msec = tempo_msec + (int)((song.tempo_ticks[i] - tempo_ticks) * ticks2time);
+        tempo_msec = msec;
+        tempo_ticks = song.tempo_ticks[i];
+        ticks2time = (double)song.tempo_values[i] / (1000.0 * song.division);
+    }
+    int msec = tempo_msec + (int)((tick - tempo_ticks) * ticks2time);
+    return msec;
+}
+
+static tml_message* build_messages(const MidiSong& song, MetaBundle* meta) {
     if (song.events.empty()) return nullptr;
     std::vector<MidiEventRaw> events = song.events;
     std::sort(events.begin(), events.end(), [](const MidiEventRaw& a, const MidiEventRaw& b){ return a.tick < b.tick; });
@@ -132,18 +168,22 @@ static tml_message* build_messages(const MidiSong& song) {
         arr[i].time = (unsigned int)msec;
         arr[i].type = e.type;
         arr[i].channel = e.channel;
-        if (e.type == TML_NOTE_ON || e.type == TML_NOTE_OFF) { arr[i].key = (char)e.key; arr[i].velocity = (char)e.velocity; }
-        else if (e.type == TML_KEY_PRESSURE) { arr[i].key = (char)e.key; arr[i].key_pressure = (char)e.velocity; }
-        else if (e.type == TML_CONTROL_CHANGE) { arr[i].control = (char)e.control; arr[i].control_value = (char)e.control_value; }
-        else if (e.type == TML_PROGRAM_CHANGE) { arr[i].program = (char)e.key; }
-        else if (e.type == TML_CHANNEL_PRESSURE) { arr[i].channel_pressure = (char)e.key; }
-        else if (e.type == TML_PITCH_BEND) { arr[i].pitch_bend = e.pitch_bend; }
+        if (e.type == E_NOTE_ON || e.type == E_NOTE_OFF) { arr[i].key = (char)e.key; arr[i].velocity = (char)e.velocity; }
+        else if (e.type == E_POLYPHONIC_KEY_PRESSURE) { arr[i].key = (char)e.key; arr[i].key_pressure = (char)e.velocity; }
+        else if (e.type == E_CONTROL_CHANGE) { arr[i].control = (char)e.control; arr[i].control_value = (char)e.control_value; }
+        else if (e.type == E_PROGRAM_CHANGE) { arr[i].program = (char)e.key; }
+        else if (e.type == E_CHANNEL_PRESSURE) { arr[i].channel_pressure = (char)e.key; }
+        else if (e.type == E_PITCH_BEND) { arr[i].pitch_bend = e.pitch_bend; }
         arr[i].next = (i + 1 < events.size()) ? &arr[i+1] : nullptr;
+    }
+    if (meta) {
+        for (auto& mk : meta->markers) mk.first = (uint32_t)tick_to_ms(song, mk.first);
+        for (auto& ly : meta->lyrics) ly.first = (uint32_t)tick_to_ms(song, ly.first);
     }
     return arr;
 }
 
-tml_message* MidiParser::parseFile(const char* path) {
+tml_message* MidiParser::parseFile(const char* path, MetaBundle* outMeta) {
     std::ifstream f(path, std::ios::binary);
     if (!f) return nullptr;
     f.seekg(0, std::ios::end);
@@ -159,8 +199,8 @@ tml_message* MidiParser::parseFile(const char* path) {
     int division = (int)read_be16(&buf[12]);
     if ((division & 0x8000) != 0) return nullptr;
     MidiSong song;
-    parse_tracks(buf, num_tracks, division, song);
-    return build_messages(song);
+    parse_tracks(buf, num_tracks, division, song, outMeta);
+    return build_messages(song, outMeta);
 }
 
 }

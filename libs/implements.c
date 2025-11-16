@@ -7,9 +7,6 @@
 // revision: 21f84301f8aea16e06c2cd2e777383a2aae71732
 #define TSF_IMPLEMENTATION
 #include "tsf.h"
-// TinyMidiLoader is a part of the TinySoundFont project
-#define TML_IMPLEMENTATION
-#include "tml.h"
 // https://github.com/mackron/dr_libs
 // revision: da35f9d6c7374a95353fd1df1d394d44ab66cf01
 // only required by the wav file renderer part
