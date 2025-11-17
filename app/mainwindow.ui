@@ -206,6 +206,7 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="actionHelp"/>
+    <addaction name="actionDonate"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuSoundFont">
@@ -376,6 +377,11 @@
    </property>
    <property name="text">
     <string>Convert to Wav</string>
+   </property>
+  </action>
+  <action name="actionDonate">
+   <property name="text">
+    <string>Donate</string>
    </property>
   </action>
  </widget>

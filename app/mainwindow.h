@@ -54,6 +54,7 @@ private slots:
     void on_playlistView_activated(const QModelIndex &index);
     void on_actionTogglePlaylist_toggled(bool visible);
     void on_actionConvertToWav_triggered();
+    void on_actionDonate_triggered();
 
 private:
     void dragEnterEvent(QDragEnterEvent *event) override;

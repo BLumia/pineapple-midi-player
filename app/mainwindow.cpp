@@ -19,6 +19,7 @@
 
 #include <QDir>
 #include <QDropEvent>
+#include <QDesktopServices>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QMessageBox>
@@ -454,7 +455,7 @@ void MainWindow::on_actionAbout_triggered()
 {
     const QString mitLicense(QStringLiteral(R"(Expat/MIT License
 
-Copyright &copy; 2024 BLumia
+Copyright &copy; 2025 BLumia
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -490,7 +491,7 @@ SOFTWARE.
         licenseBox.exec();
     });
     infoBox.setText(
-        "Pineapple MIDI Player " PMIDI_VERSION_STRING
+        QString("%1 %2").arg(tr("Pineapple MIDI Player")).arg(PMIDI_VERSION_STRING) %
         "\n\n" %
         tr("Based on the following free software libraries:") %
         "\n\n" %
@@ -580,3 +581,7 @@ void MainWindow::on_actionConvertToWav_triggered()
     Player::instance()->renderToWav(QFile::encodeName(path));
 }
 
+void MainWindow::on_actionDonate_triggered()
+{
+    QDesktopServices::openUrl(QUrl("https://link.blumia.net/pineapple-apps-donate"));
+}
