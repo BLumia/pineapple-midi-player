@@ -6,27 +6,27 @@
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="14"/>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Geluidsinstellingen</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="22"/>
         <source>Output Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitvoerapparaat</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="39"/>
         <source>Sample Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Samplesnelheid</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="49"/>
         <source>Buffer Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Buffergrootte</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.cpp" line="57"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch</translation>
     </message>
 </context>
 <context>
@@ -149,7 +149,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="338"/>
         <source>Audio Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Geluidsinstellingen…</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="346"/>
