@@ -82,8 +82,7 @@ struct MetaBundle {
 struct MidiSong {
     int division;
     std::vector<MidiEventRaw> events;
-    std::vector<uint32_t> tempo_ticks;
-    std::vector<uint32_t> tempo_values;
+    std::vector<std::pair<uint32_t, uint32_t>> tempo_changes;
 };
 
 class MidiParser {

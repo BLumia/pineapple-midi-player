@@ -34,8 +34,7 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
     int off = 14;
     song.division = division;
     song.events.clear();
-    song.tempo_ticks.clear();
-    song.tempo_values.clear();
+
     for (int t = 0; t < num_tracks; ++t) {
         if (off + 8 > (int)file.size()) break;
         const uint8_t* th = &file[off];
@@ -64,8 +63,7 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
                 const uint8_t* metadata = ctx.data + ctx.off;
                 if (meta_type == ME_TEMPO && len == 3) {
                     uint32_t tempo = (uint32_t)metadata[0]<<16 | (uint32_t)metadata[1]<<8 | (uint32_t)metadata[2];
-                    song.tempo_ticks.push_back(ctx.ticks);
-                    song.tempo_values.push_back(tempo);
+                    song.tempo_changes.push_back({ctx.ticks, tempo});
                 } else if (meta_type == ME_MIDI_PORT && len == 1) {
                     ctx.current_port = metadata[0];
                 } else if (meta && meta_type == ME_TRACK_NAME) {
@@ -128,18 +126,19 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
         }
         off += track_len;
     }
+    std::sort(song.tempo_changes.begin(), song.tempo_changes.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
 }
 
 static int tick_to_ms(const MidiSong& song, uint32_t tick) {
     double ticks2time = 500000.0 / (1000.0 * song.division);
     uint32_t tempo_ticks = 0;
     int tempo_msec = 0;
-    for (size_t i = 0; i < song.tempo_ticks.size(); ++i) {
-        if (song.tempo_ticks[i] > tick) break;
-        int msec = tempo_msec + (int)((song.tempo_ticks[i] - tempo_ticks) * ticks2time);
+    for (size_t i = 0; i < song.tempo_changes.size(); ++i) {
+        if (song.tempo_changes[i].first > tick) break;
+        int msec = tempo_msec + (int)((song.tempo_changes[i].first - tempo_ticks) * ticks2time);
         tempo_msec = msec;
-        tempo_ticks = song.tempo_ticks[i];
-        ticks2time = (double)song.tempo_values[i] / (1000.0 * song.division);
+        tempo_ticks = song.tempo_changes[i].first;
+        ticks2time = (double)song.tempo_changes[i].second / (1000.0 * song.division);
     }
     int msec = tempo_msec + (int)((tick - tempo_ticks) * ticks2time);
     return msec;
@@ -148,7 +147,7 @@ static int tick_to_ms(const MidiSong& song, uint32_t tick) {
 static tml_message* build_messages(const MidiSong& song, MetaBundle* meta) {
     if (song.events.empty()) return nullptr;
     std::vector<MidiEventRaw> events = song.events;
-    std::sort(events.begin(), events.end(), [](const MidiEventRaw& a, const MidiEventRaw& b){ return a.tick < b.tick; });
+    std::stable_sort(events.begin(), events.end(), [](const MidiEventRaw& a, const MidiEventRaw& b){ return a.tick < b.tick; });
     double ticks2time = 500000.0 / (1000.0 * song.division);
     uint32_t tempo_ticks = 0;
     int tempo_msec = 0;
@@ -156,11 +155,12 @@ static tml_message* build_messages(const MidiSong& song, MetaBundle* meta) {
     tml_message* arr = (tml_message*)malloc(sizeof(tml_message) * events.size());
     for (size_t i = 0; i < events.size(); ++i) {
         const auto& e = events[i];
-        while (tempo_idx < song.tempo_ticks.size() && song.tempo_ticks[tempo_idx] <= e.tick) {
-            double t = (double)song.tempo_values[tempo_idx];
-            int msec = tempo_msec + (int)((tempo_ticks ? (song.tempo_ticks[tempo_idx] - tempo_ticks) : song.tempo_ticks[tempo_idx]) * ticks2time);
-            tempo_msec = msec;
-            tempo_ticks = song.tempo_ticks[tempo_idx];
+        while (tempo_idx < song.tempo_changes.size() && song.tempo_changes[tempo_idx].first <= e.tick) {
+            double t = (double)song.tempo_changes[tempo_idx].second;
+            int delta_ticks = song.tempo_changes[tempo_idx].first - tempo_ticks;
+            int msec_to_add = (int)(delta_ticks * ticks2time);
+            tempo_msec += msec_to_add;
+            tempo_ticks = song.tempo_changes[tempo_idx].first;
             ticks2time = t / (1000.0 * song.division);
             tempo_idx++;
         }
