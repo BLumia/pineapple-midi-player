@@ -62,6 +62,7 @@ struct MidiEventRaw {
 };
 
 struct TrackMeta {
+    bool have_midi_event = false;
     std::string name;
     std::string instrument;
 };
@@ -77,6 +78,9 @@ struct MetaBundle {
     uint8_t timesig_thirtyseconds = 0;
     int8_t keysig = 0;
     uint8_t keysig_mode = 0; // 0=major, 1=minor
+    std::string title() const {
+        return (tracks.size() > 0 && !tracks.at(0).have_midi_event) ? tracks.at(0).name : std::string();
+    };
 };
 
 struct MidiSong {

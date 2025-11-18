@@ -93,7 +93,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, &MainWindow::midiFileLoaded, this, [this](const QString path){
         QFileInfo fi(path);
-        ui->midiFileLabel->setText(fi.fileName());
+        const auto& meta = Player::instance()->midiMeta();
+        QString midiTitle(QString::fromStdString(meta.title()).trimmed());
+        ui->midiFileLabel->setText((midiTitle.isEmpty() || midiTitle == fi.baseName()) ? fi.fileName() : QString("%1 (%2)").arg(midiTitle).arg(fi.fileName()));
         ui->midiFileLabel->setToolTip(fi.fileName());
         m_currentMidiFilePath = path;
 

@@ -98,6 +98,7 @@ static void parse_tracks(const std::vector<uint8_t>& file, int num_tracks, int d
                 ctx.off += len;
                 continue;
             }
+            if (meta) meta->tracks[t].have_midi_event = true;
             int param1 = -1, param2 = 0;
             if (ctx.off >= ctx.size) break;
             param1 = ctx.data[ctx.off++] & 0x7F;
