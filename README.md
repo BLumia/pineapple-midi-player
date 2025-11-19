@@ -4,7 +4,7 @@ Pineapple MIDI Player is a simple SoundFont MIDI player, designed to play simple
 
 Based on the following projects:
 
-- [TinySoundFont and TinyMidiLoader](https://github.com/schellingb/TinySoundFont) (MIT License)
+- [TinySoundFont](https://github.com/schellingb/TinySoundFont) (MIT License)
 - [PortAudio](https://www.portaudio.com/) (MIT License)
 - [Qt 6 (Widgets)](https://www.qt.io/) (LGPLv3 License)
 - `stb_vorbis.c` from [stb](https://github.com/nothings/stb/) (Public Domain or MIT License)

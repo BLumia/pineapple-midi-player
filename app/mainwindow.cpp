@@ -501,7 +501,7 @@ SOFTWARE.
         QStringLiteral("- [PortAudio](https://www.portaudio.com/) %1.%2.%3\n").arg(Pa_GetVersionInfo()->versionMajor)
                                                                               .arg(Pa_GetVersionInfo()->versionMinor)
                                                                               .arg(Pa_GetVersionInfo()->versionSubMinor) %
-        "- `tsf.h` and `tml.h` from [TinySoundFont](https://github.com/schellingb/TinySoundFont/)\n"
+        "- `tsf.h` from [TinySoundFont](https://github.com/schellingb/TinySoundFont/)\n"
         "- `dr_wav.h` from [dr_libs](https://github.com/mackron/dr_libs)\n"
         "- `stb_vorbis.c` from [stb](https://github.com/nothings/stb)\n"
         "- `opl.h` from [dos-like](https://github.com/mattiasgustavsson/dos-like)\n"
