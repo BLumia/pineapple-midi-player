@@ -6,28 +6,28 @@
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="14"/>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Audioeinstellungen</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="22"/>
         <source>Output Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgabegerät</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="39"/>
         <source>Sample Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Abtastrate</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="49"/>
         <source>Buffer Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Puffergröße</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.cpp" line="27"/>
         <location filename="../app/audiosettingsdialog.cpp" line="58"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch</translation>
     </message>
 </context>
 <context>
@@ -151,7 +151,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="339"/>
         <source>Audio Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Audioeinstellungen...</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="347"/>
@@ -176,7 +176,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="384"/>
         <source>Donate</source>
-        <translation type="unfinished"></translation>
+        <translation>Spenden</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="225"/>

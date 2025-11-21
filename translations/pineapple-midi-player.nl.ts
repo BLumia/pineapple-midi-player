@@ -176,7 +176,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="384"/>
         <source>Donate</source>
-        <translation type="unfinished"></translation>
+        <translation>Doneren</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="225"/>
