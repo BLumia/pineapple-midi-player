@@ -2,3 +2,7 @@ build/
 CMakeLists.txt.user*
 .DS_Store
 .cache/
+
+# IDE
+.idea/
+.qtcreator/

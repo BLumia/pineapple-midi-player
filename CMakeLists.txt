@@ -53,6 +53,8 @@ qt_add_resources(${EXE_NAME} resources.qrc
 target_sources(${EXE_NAME}
 PRIVATE
     app/main.cpp
+    app/abstractplayer.h
+    app/abstractplayer.cpp
     app/player.h
     app/player.cpp
     app/mainwindow.cpp

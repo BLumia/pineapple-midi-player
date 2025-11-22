@@ -8,36 +8,15 @@
 #include <variant>
 #include <functional>
 #include <atomic>
-#include <string>
-#include <vector>
 
+#include "abstractplayer.h"
 #include "tsf.h"
 #include "opl.h"
 #include "midi_parser.h"
 
-typedef void PaStream;
-class Player
+class Player : public AbstractPlayer
 {
 public:
-    struct AudioSettings {
-        int deviceIndex = -1;
-        int sampleRate = 44100;
-        int channels = 2;
-        unsigned long framesPerBuffer = 0; // 0 = unspecified/auto
-        double suggestedLatency = 0.0; // 0 = use device default
-    };
-
-    struct DeviceInfo {
-        int index = -1;
-        std::string name;
-        std::string hostApi;
-        int maxOutputChannels = 0;
-        double defaultSampleRate = 0.0;
-        double defaultLowLatency = 0.0;
-        double defaultHighLatency = 0.0;
-        bool isDefaultOutput = false;
-    };
-
     enum InfoType {
         I_USED_CHANNELS,
         I_USED_PROGRAMS,
@@ -50,21 +29,11 @@ public:
 
     ~Player();
 
-    void play();
-    void pause();
-    void stop();
-    bool isPlaying() const;
     void seekTo(unsigned int ms);
-    bool loop() const;
-    void setLoop(bool loop);
     std::map<enum InfoType, std::variant<int, unsigned int> > midiInfo() const;
     const pmidi::MetaBundle& midiMeta() const;
     unsigned int currentPlaybackPositionMs() const;
-    AudioSettings currentAudioSettings() const;
-    std::vector<DeviceInfo> enumerateOutputDevices() const;
     bool applyAudioSettings(const AudioSettings &settings);
-
-    void setVolume(float volume);
 
     bool loadMidiFile(const char * filePath);
     bool loadSF2File(const char * sf2Path);
@@ -72,8 +41,11 @@ public:
 
     bool renderToWav(const char * filePath);
 
-    void setPlaybackCallback(std::function<void(unsigned int)> cb);
-    void onIsPlayingChanged(std::function<void(bool)> cb);
+protected:
+    // Virtual function overrides
+    void renderAudio(float *buffer, unsigned long numFrames) override;
+    void onStop() override;
+    void onSeek(unsigned int ms) override;
 
 private:
     Player();
@@ -82,15 +54,7 @@ private:
     std::tuple<double, tml_message *> renderToBuffer(float * buffer, tml_message * startMsg, double startMs, int sampleCount);
 
     static Player * m_player_instance;
-    bool setupAndStartStream();
-    int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames);
 
-    float m_volume = 1;
-    std::atomic<bool> m_isPlaying{false};
-    std::atomic<bool> m_loop{true};
-
-    PaStream * m_stream = nullptr;
-    AudioSettings m_audioSettings;
     tml_message* m_tinyMidiLoader = NULL;
     pmidi::MetaBundle m_meta;
     tsf* m_tinySoundFont = NULL;
@@ -100,6 +64,4 @@ private:
     std::atomic<tml_message*> m_seekToMessagePos{NULL};
     std::atomic<unsigned int> m_seekToMSec{0};
     std::atomic<unsigned int> m_uiPlaybackMs{0};
-    std::function<void(unsigned int)> mf_playbackCallback;
-    std::function<void(bool)> mf_onIsPlayingChanged;
 };

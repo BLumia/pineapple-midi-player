@@ -522,7 +522,7 @@ SOFTWARE.
 
 void MainWindow::on_actionAudioSettings_triggered()
 {
-    AudioSettingsDialog dlg(this);
+    AudioSettingsDialog dlg(Player::instance(), this);
     dlg.exec();
 }
 

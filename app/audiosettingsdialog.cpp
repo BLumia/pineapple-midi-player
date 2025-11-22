@@ -9,10 +9,12 @@
 #include "player.h"
 #include "settings.h"
 
-AudioSettingsDialog::AudioSettingsDialog(QWidget *parent)
+AudioSettingsDialog::AudioSettingsDialog(AbstractPlayer *player, QWidget *parent)
     : QDialog(parent)
+    , m_player(player)
     , ui(new Ui::AudioSettingsDialog)
 {
+    Q_CHECK_PTR(player);
     ui->setupUi(this);
     populateDevices();
     populateSampleRates();
@@ -25,9 +27,9 @@ void AudioSettingsDialog::populateDevices()
 {
     ui->deviceCombo->clear();
     ui->deviceCombo->addItem(tr("Auto"), -1);
-    const auto devices = Player::instance()->enumerateOutputDevices();
+    const auto devices = m_player->enumerateOutputDevices();
     int currentIndex = -1;
-    const auto cur = Player::instance()->currentAudioSettings();
+    const auto cur = m_player->currentAudioSettings();
     for (const auto &d : devices) {
         const QString text = QString::fromStdString(d.name) + QStringLiteral(" (") + QString::fromStdString(d.hostApi) + QStringLiteral(")");
         ui->deviceCombo->addItem(text, d.index);
@@ -42,7 +44,7 @@ void AudioSettingsDialog::populateSampleRates()
 {
     ui->sampleRateCombo->clear();
     const QList<int> rates{44100, 48000, 88200, 96000};
-    const auto cur = Player::instance()->currentAudioSettings();
+    const auto cur = m_player->currentAudioSettings();
     int currentIndex = -1;
     for (int r : rates) {
         ui->sampleRateCombo->addItem(QString::number(r), r);
@@ -56,7 +58,7 @@ void AudioSettingsDialog::populateBufferSizes()
     ui->bufferSizeCombo->clear();
     struct Item { QString label; int value; };
     const Item items[]{{tr("Auto"), 0}, {QStringLiteral("64"), 64}, {QStringLiteral("128"), 128}, {QStringLiteral("256"), 256}, {QStringLiteral("512"), 512}, {QStringLiteral("1024"), 1024}};
-    const auto cur = Player::instance()->currentAudioSettings();
+    const auto cur = m_player->currentAudioSettings();
     int currentIndex = -1;
     for (const auto &it : items) {
         ui->bufferSizeCombo->addItem(it.label, it.value);
@@ -74,7 +76,7 @@ void AudioSettingsDialog::applySettings()
     s.framesPerBuffer = (unsigned long)ui->bufferSizeCombo->currentData().toInt();
     s.suggestedLatency = 0.0;
 
-    if (Player::instance()->applyAudioSettings(s)) {
+    if (m_player->applyAudioSettings(s)) {
         Settings::instance()->setAudioDeviceIndex(s.deviceIndex);
         Settings::instance()->setAudioSampleRate(s.sampleRate);
         Settings::instance()->setAudioFramesPerBuffer((int)s.framesPerBuffer);

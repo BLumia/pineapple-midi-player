@@ -34,81 +34,19 @@ Player * Player::instance()
     return m_player_instance;
 }
 
-void Player::play()
-{
-    if (!m_stream) {
-        if (!setupAndStartStream()) {
-            fputs("Not able to create playback stream\n", stderr);
-            return;
-        }
-    } else {
-        PaError active = Pa_IsStreamActive(m_stream);
-        if (active == 0) {
-            fputs("Playback stream stopped, restarting...", stderr);
-            PaError err = Pa_StartStream(m_stream);
-            if (err != paNoError) {
-                fprintf(stderr, "Pa_StartStream failed: %s, reopening...\n", Pa_GetErrorText(err));
-                if (!setupAndStartStream()) {
-                    fputs("Not able to restart playback stream\n", stderr);
-                    return;
-                }
-            }
-        } else if (active < 0) {
-            fprintf(stderr, "Pa_IsStreamActive error: %s, reopening...\n", Pa_GetErrorText(active));
-            if (!setupAndStartStream()) {
-                fputs("Not able to restart playback stream\n", stderr);
-                return;
-            }
-        }
-    }
-    m_isPlaying.store(true);
-    if (mf_onIsPlayingChanged) mf_onIsPlayingChanged(m_isPlaying);
-}
-
-void Player::pause()
-{
-    m_isPlaying.store(false);
-    if (mf_onIsPlayingChanged) mf_onIsPlayingChanged(m_isPlaying);
-}
-
-void Player::stop()
-{
-    pause();
-
-    opl_clear(m_opl);
-    if (m_tinySoundFont != NULL) tsf_note_off_all(m_tinySoundFont);
-    m_currentPlaybackMSec = 0;
-    if (m_tinyMidiLoader != NULL) m_currentPlaybackMessagePos = m_tinyMidiLoader;
-}
-
-bool Player::isPlaying() const
-{
-    return m_isPlaying.load();
-}
-
-void Player::seekTo(unsigned int ms)
+void Player::onSeek(unsigned int ms)
 {
     if (m_tinyMidiLoader) {
         opl_clear(m_opl);
         if (m_tinySoundFont) tsf_note_off_all(m_tinySoundFont);
-        m_seekToMSec.store(ms);
         tml_message* search = m_tinyMidiLoader;
         while (search->next) {
             if (search->time > ms) break;
             search = search->next;
         }
-        m_seekToMessagePos.store(search);
+        m_currentPlaybackMessagePos = search;
+        m_currentPlaybackMSec = (double)ms;
     }
-}
-
-bool Player::loop() const
-{
-    return m_loop.load();
-}
-
-void Player::setLoop(bool loop)
-{
-    m_loop.store(loop);
 }
 
 std::map<Player::InfoType, std::variant<int, unsigned int> > Player::midiInfo() const
@@ -138,13 +76,6 @@ std::map<Player::InfoType, std::variant<int, unsigned int> > Player::midiInfo() 
     info[I_1ST_NOTE_MS] = timeFirstNoteMs;
     info[I_LENGTH_MS] = timeLengthMs;
     return info;
-}
-
-void Player::setVolume(float volume)
-{
-    m_volume = volume;
-
-    if (m_tinySoundFont) tsf_set_volume(m_tinySoundFont, m_volume);
 }
 
 bool Player::loadMidiFile(const char *filePath)
@@ -198,9 +129,6 @@ bool Player::loadSF2File(const char *sf2Path)
     int sr = (m_audioSettings.sampleRate > 0) ? m_audioSettings.sampleRate : SAMPLE_RATE;
     tsf_set_output(m_tinySoundFont, TSF_STEREO_INTERLEAVED, sr, 0.0f);
 
-    // Init volume
-    tsf_set_volume(m_tinySoundFont, m_volume);
-
     return true;
 }
 
@@ -248,45 +176,13 @@ bool Player::renderToWav(const char *filePath)
     return true;
 }
 
-void Player::setPlaybackCallback(std::function<void (unsigned int)> cb)
-{
-    mf_playbackCallback = cb;
-}
-
-void Player::onIsPlayingChanged(std::function<void (bool)> cb)
-{
-    mf_onIsPlayingChanged = cb;
-}
-
-Player::Player()
+Player::Player() : AbstractPlayer()
 {
     m_opl = opl_create();
-
-    PaError initErr = Pa_Initialize();
-    if (initErr != paNoError) {
-        fprintf(stderr, "Pa_Initialize failed: %s\n", Pa_GetErrorText(initErr));
-    }
-    if (!setupAndStartStream()) {
-        fputs("Failed to open/start audio stream.\n", stderr);
-    }
 }
 
 Player::~Player()
 {
-    if (m_stream) {
-        PaError err = Pa_StopStream(m_stream);
-        if (err != paNoError) {
-            fprintf(stderr, "Pa_StopStream failed: %s\n", Pa_GetErrorText(err));
-        }
-        err = Pa_CloseStream(m_stream);
-        if (err != paNoError) {
-            fprintf(stderr, "Pa_CloseStream failed: %s\n", Pa_GetErrorText(err));
-        }
-        m_stream = nullptr;
-    }
-
-    Pa_Terminate();
-
     opl_destroy(m_opl);
 }
 
@@ -362,167 +258,84 @@ std::tuple<double, tml_message *> Player::renderToBuffer(float *buffer, tml_mess
     return std::make_tuple(playbackEnd, curMsg);
 }
 
+void Player::onStop()
+{
+    opl_clear(m_opl);
+    if (m_tinySoundFont != NULL)
+        tsf_note_off_all(m_tinySoundFont);
+    m_currentPlaybackMSec = 0;
+    if (m_tinyMidiLoader != NULL)
+        m_currentPlaybackMessagePos = m_tinyMidiLoader;
+}
+
+void Player::seekTo(unsigned int ms)
+{
+    if (m_tinyMidiLoader) {
+        opl_clear(m_opl);
+        if (m_tinySoundFont)
+            tsf_note_off_all(m_tinySoundFont);
+        m_seekToMSec.store(ms);
+        tml_message *search = m_tinyMidiLoader;
+        while (search->next) {
+            if (search->time > ms)
+                break;
+            search = search->next;
+        }
+        m_seekToMessagePos.store(search);
+    }
+}
+
 unsigned int Player::currentPlaybackPositionMs() const
 {
     return m_uiPlaybackMs.load();
 }
 
-Player::AudioSettings Player::currentAudioSettings() const
+void Player::renderAudio(float *buffer, unsigned long numFrames)
 {
-    return m_audioSettings;
-}
-
-std::vector<Player::DeviceInfo> Player::enumerateOutputDevices() const
-{
-    std::vector<DeviceInfo> list;
-    int count = Pa_GetDeviceCount();
-    if (count < 0) return list;
-    int defaultIndex = Pa_GetDefaultOutputDevice();
-    for (int i = 0; i < count; ++i) {
-        const PaDeviceInfo *info = Pa_GetDeviceInfo(i);
-        if (!info) continue;
-        if (info->maxOutputChannels <= 0) continue;
-        const PaHostApiInfo *api = Pa_GetHostApiInfo(info->hostApi);
-        DeviceInfo di;
-        di.index = i;
-        di.name = info->name ? info->name : "";
-        di.hostApi = api ? (api->name ? api->name : "") : "";
-        di.maxOutputChannels = info->maxOutputChannels;
-        di.defaultSampleRate = info->defaultSampleRate;
-        di.defaultLowLatency = info->defaultLowOutputLatency;
-        di.defaultHighLatency = info->defaultHighOutputLatency;
-        di.isDefaultOutput = (i == defaultIndex);
-        list.push_back(std::move(di));
+    if (!m_tinyMidiLoader) {
+        std::fill(buffer, buffer + numFrames * 2, 0);
+        return;
     }
-    return list;
+
+    std::uint8_t * byteBuffer = (std::uint8_t *)buffer;
+    // Check and apply seek
+    if (m_seekToMessagePos.load() != NULL) {
+        tml_message* target = m_seekToMessagePos.exchange(NULL);
+        unsigned int targetMs = m_seekToMSec.exchange(0);
+        m_currentPlaybackMessagePos = target;
+        m_currentPlaybackMSec = (double)targetMs;
+    }
+
+    // Number of samples to process
+    int SampleBlock, SampleCount = numFrames;
+    for (SampleBlock = TSF_RENDER_EFFECTSAMPLEBLOCK; SampleCount;
+         SampleCount -= SampleBlock, byteBuffer += (SampleBlock * (2 * sizeof(float)))) {
+        // We progress the MIDI playback and then process TSF_RENDER_EFFECTSAMPLEBLOCK samples at once
+        if (SampleBlock > SampleCount)
+            SampleBlock = SampleCount;
+
+        std::tie(m_currentPlaybackMSec, m_currentPlaybackMessagePos) =
+                renderToBuffer((float *)byteBuffer, m_currentPlaybackMessagePos,
+                               m_currentPlaybackMSec, SampleBlock);
+    }
+
+    if (!m_currentPlaybackMessagePos) {
+        m_currentPlaybackMSec = 0;
+        m_currentPlaybackMessagePos = m_tinyMidiLoader;
+        if (!m_loop.load()) {
+            m_isPlaying.store(false);
+        }
+    }
+    m_uiPlaybackMs.store((unsigned int)m_currentPlaybackMSec);
 }
 
 bool Player::applyAudioSettings(const AudioSettings &settings)
 {
-    fprintf(stderr, "Apply audio settings: device=%d, sr=%d, ch=%d, fpb=%lu\n",
-            settings.deviceIndex, settings.sampleRate, settings.channels, settings.framesPerBuffer);
-    bool wasPlaying = m_isPlaying.load();
-    m_audioSettings = settings;
-    if (!setupAndStartStream()) {
-        fprintf(stderr, "Apply audio settings failed, stream rebuild failed.\n");
-        return false;
-    }
-    if (m_tinySoundFont) {
+    bool result = AbstractPlayer::applyAudioSettings(settings);
+    if (result && m_tinySoundFont) {
         int sr = (m_audioSettings.sampleRate > 0) ? m_audioSettings.sampleRate : SAMPLE_RATE;
         tsf_set_output(m_tinySoundFont, TSF_STEREO_INTERLEAVED, sr, 0.0f);
         fprintf(stderr, "TSF output reconfigured to sr=%d\n", sr);
     }
-    m_isPlaying.store(wasPlaying);
-    return true;
+    return result;
 }
-
-bool Player::setupAndStartStream()
-{
-    if (m_stream) {
-        Pa_StopStream(m_stream);
-        Pa_CloseStream(m_stream);
-        m_stream = nullptr;
-    }
-
-    PaStreamParameters outParams{};
-    outParams.device = (m_audioSettings.deviceIndex >= 0) ? m_audioSettings.deviceIndex : Pa_GetDefaultOutputDevice();
-    const PaDeviceInfo *devInfo = Pa_GetDeviceInfo(outParams.device);
-    if (!devInfo) {
-        fprintf(stderr, "Invalid output device index: %d\n", outParams.device);
-        return false;
-    }
-    outParams.channelCount = m_audioSettings.channels;
-    outParams.sampleFormat = paFloat32;
-    outParams.suggestedLatency = (m_audioSettings.suggestedLatency > 0.0)
-                                 ? m_audioSettings.suggestedLatency
-                                 : devInfo->defaultLowOutputLatency;
-    outParams.hostApiSpecificStreamInfo = nullptr;
-
-    double sr = (m_audioSettings.sampleRate > 0) ? (double)m_audioSettings.sampleRate : devInfo->defaultSampleRate;
-    PaError err = Pa_IsFormatSupported(nullptr, &outParams, sr);
-    if (err != paFormatIsSupported) {
-        fprintf(stderr, "Format not supported: device=%d (%s), ch=%d, sr=%.2f\n",
-                outParams.device, devInfo->name ? devInfo->name : "?",
-                outParams.channelCount, sr);
-        return false;
-    }
-
-    fprintf(stderr, "Opening stream: device=%d (%s), host=%s, ch=%d, sr=%.2f, fpb=%lu\n",
-            outParams.device,
-            devInfo->name ? devInfo->name : "?",
-            Pa_GetHostApiInfo(devInfo->hostApi) ? Pa_GetHostApiInfo(devInfo->hostApi)->name : "?",
-            outParams.channelCount, sr,
-            (m_audioSettings.framesPerBuffer == 0) ? paFramesPerBufferUnspecified : m_audioSettings.framesPerBuffer);
-
-    err = Pa_OpenStream(&m_stream,
-                        nullptr,
-                        &outParams,
-                        sr,
-                        (m_audioSettings.framesPerBuffer == 0) ? paFramesPerBufferUnspecified : m_audioSettings.framesPerBuffer,
-                        paNoFlag,
-                        +[](const void *inputBuffer, void *outputBuffer,
-                            unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
-                            PaStreamCallbackFlags statusFlags, void *userData) -> int {
-                            return ((Player *)userData)->streamCallback(inputBuffer, outputBuffer, framesPerBuffer);
-                        }, this);
-    if (err != paNoError) {
-        fprintf(stderr, "Pa_OpenStream failed: %s\n", Pa_GetErrorText(err));
-        m_stream = nullptr;
-        return false;
-    }
-
-    // sync chosen sr back to settings to keep TSF/render in sync
-    m_audioSettings.sampleRate = static_cast<int>(sr);
-
-    err = Pa_StartStream(m_stream);
-    if (err != paNoError) {
-        fprintf(stderr, "Pa_StartStream failed: %s\n", Pa_GetErrorText(err));
-        Pa_CloseStream(m_stream);
-        m_stream = nullptr;
-        return false;
-    }
-    fprintf(stderr, "Stream started successfully.\n");
-    return true;
-}
-
-int Player::streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames)
-{
-    if (m_tinyMidiLoader && m_isPlaying.load()) {
-        std::uint8_t * buffer = (std::uint8_t *)outputBuffer;
-        // Check and apply seek
-        if (m_seekToMessagePos.load() != NULL) {
-            tml_message* target = m_seekToMessagePos.exchange(NULL);
-            unsigned int targetMs = m_seekToMSec.exchange(0);
-            m_currentPlaybackMessagePos = target;
-            m_currentPlaybackMSec = (double)targetMs;
-        }
-
-        //Number of samples to process
-        int SampleBlock, SampleCount = numFrames;
-        for (SampleBlock = TSF_RENDER_EFFECTSAMPLEBLOCK;
-             SampleCount;
-             SampleCount -= SampleBlock, buffer += (SampleBlock * (2 * sizeof(float))))
-        {
-            //We progress the MIDI playback and then process TSF_RENDER_EFFECTSAMPLEBLOCK samples at once
-            if (SampleBlock > SampleCount) SampleBlock = SampleCount;
-
-            std::tie(m_currentPlaybackMSec, m_currentPlaybackMessagePos)
-                = renderToBuffer((float*)buffer, m_currentPlaybackMessagePos, m_currentPlaybackMSec, SampleBlock);
-        }
-
-        if (!m_currentPlaybackMessagePos) {
-            m_currentPlaybackMSec = 0;
-            m_currentPlaybackMessagePos = m_tinyMidiLoader;
-            if (!m_loop.load()) {
-                m_isPlaying.store(false);
-            }
-        }
-        m_uiPlaybackMs.store((unsigned int)m_currentPlaybackMSec);
-    } else {
-        float* buffer = (float*)outputBuffer;
-        std::fill(buffer, buffer + numFrames * 2, 0);
-    }
-
-    return paContinue;
-}
-
