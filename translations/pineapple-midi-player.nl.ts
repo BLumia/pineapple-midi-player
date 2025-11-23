@@ -14,18 +14,23 @@
         <translation>Uitvoerapparaat</translation>
     </message>
     <message>
-        <location filename="../app/audiosettingsdialog.ui" line="39"/>
+        <location filename="../app/audiosettingsdialog.ui" line="29"/>
         <source>Sample Rate</source>
         <translation>Samplesnelheid</translation>
     </message>
     <message>
-        <location filename="../app/audiosettingsdialog.ui" line="49"/>
+        <location filename="../app/audiosettingsdialog.ui" line="39"/>
         <source>Buffer Size</source>
         <translation>Buffergrootte</translation>
     </message>
     <message>
-        <location filename="../app/audiosettingsdialog.cpp" line="27"/>
-        <location filename="../app/audiosettingsdialog.cpp" line="58"/>
+        <location filename="../app/audiosettingsdialog.ui" line="61"/>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app/audiosettingsdialog.cpp" line="29"/>
+        <location filename="../app/audiosettingsdialog.cpp" line="60"/>
         <source>Auto</source>
         <translation>Automatisch</translation>
     </message>
@@ -34,7 +39,7 @@
     <name>MainWindow</name>
     <message>
         <location filename="../app/mainwindow.ui" line="20"/>
-        <location filename="../app/mainwindow.cpp" line="496"/>
+        <location filename="../app/mainwindow.cpp" line="533"/>
         <source>Pineapple MIDI Player</source>
         <translation>Pineapple-midispeler</translation>
     </message>
@@ -50,7 +55,7 @@
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="99"/>
-        <location filename="../app/mainwindow.cpp" line="86"/>
+        <location filename="../app/mainwindow.cpp" line="90"/>
         <source>Play</source>
         <translation>Afspelen</translation>
     </message>
@@ -70,7 +75,7 @@
         <translation>&amp;Bestand</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="450"/>
+        <location filename="../app/mainwindow.cpp" line="487"/>
         <source>Help</source>
         <translation>Hulp</translation>
     </message>
@@ -122,14 +127,14 @@
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="288"/>
-        <location filename="../app/mainwindow.cpp" line="429"/>
-        <location filename="../app/mainwindow.cpp" line="556"/>
+        <location filename="../app/mainwindow.cpp" line="466"/>
+        <location filename="../app/mainwindow.cpp" line="595"/>
         <source>Select SoundFont...</source>
         <translation>Kies een SoundFont…</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="307"/>
-        <location filename="../app/mainwindow.cpp" line="484"/>
+        <location filename="../app/mainwindow.cpp" line="521"/>
         <source>About</source>
         <translation>Over</translation>
     </message>
@@ -179,89 +184,114 @@
         <translation>Doneren</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="225"/>
-        <location filename="../app/mainwindow.cpp" line="443"/>
+        <location filename="../app/mainwindow.cpp" line="229"/>
+        <location filename="../app/mainwindow.cpp" line="480"/>
         <source>If you don&apos;t know where to get a SoundFont, check out &lt;a href=&apos;https://musescore.org/en/handbook/3/soundfonts-and-sfz-files#list&apos;&gt;this page&lt;/a&gt; provided by MuseScore.</source>
         <translation>Als je niet weet waar je een SoundFont kunt vinden, kijk dan op &lt;a href=&apos;https://musescore.org/nl/handboek/soundfonts-en-sfz-bestanden#list&apos;&gt;deze pagina&lt;/a&gt; van MuseScore.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="85"/>
+        <location filename="../app/mainwindow.cpp" line="89"/>
         <source>Pause</source>
         <translation>Pauzeren</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="207"/>
+        <location filename="../app/mainwindow.cpp" line="211"/>
         <source>Missing MIDI file</source>
         <translation>Geen midibestand geladen</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="207"/>
+        <location filename="../app/mainwindow.cpp" line="211"/>
         <source>Please load a MIDI file first.</source>
         <translation>Laad een midibestand.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="217"/>
+        <location filename="../app/mainwindow.cpp" line="221"/>
         <source>You need to select a SoundFont before play the MIDI file.</source>
         <translation>Kies een SoundFont alvorens een midibestand af te spelen.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="219"/>
+        <location filename="../app/mainwindow.cpp" line="223"/>
         <source>You have seen this dialog for %1 times, if you really don&apos;t want to use a SoundFont, you can now ignore this warning if you want.</source>
         <translation>Je hebt dit bericht %1 keer gekregen. Als je écht geen SoundFount wilt gebruiken, kun je vanaf nu deze waarschuwing negeren.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="224"/>
+        <location filename="../app/mainwindow.cpp" line="228"/>
         <source>Missing SoundFont</source>
         <translation>Geen SoundFont beschikbaar</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="422"/>
+        <location filename="../app/mainwindow.cpp" line="283"/>
+        <source>Playback Stream Initialization Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app/mainwindow.cpp" line="284"/>
+        <source>Playback stream failed to initialize. This might be caused by the configured audio output device is no longer available, or a invalid audio output configuration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app/mainwindow.cpp" line="285"/>
+        <source>Do you want to reset to use the default output device or open the settings dialog?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app/mainwindow.cpp" line="287"/>
+        <source>Reset Audio Output Device to Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app/mainwindow.cpp" line="288"/>
+        <source>Open Audio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app/mainwindow.cpp" line="459"/>
         <source>Open...</source>
         <translation>Openen…</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="436"/>
+        <location filename="../app/mainwindow.cpp" line="473"/>
         <source>Pineapple MIDI Player is a simple SoundFont MIDI player, which requires both MIDI file and SoundFont file to play.</source>
         <translation>Pineapple-midispeler is een eenvoudig muziekprogramma voor het afspelen van SoundFonts. Hiervoor zijn zowel een midi- als which requires SoundFont-bestand benodigd.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="438"/>
+        <location filename="../app/mainwindow.cpp" line="475"/>
         <source>You can simply drag and drop SoundFont or MIDI file to quickly load/replace a SoundFont or play the given MIDI file.</source>
         <translation>Sleep een SoundFont- of midibestand naar het venster om het af te spelen.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="440"/>
+        <location filename="../app/mainwindow.cpp" line="477"/>
         <source>When trying to load a MIDI file, this player will try to load the SoundFont file with the same file name as the MIDI file by default, which is suitable for playing MIDI file extracted by, for example, [VGMTrans](https://github.com/vgmtrans/vgmtrans/).</source>
         <translation>Tijdens het laden wordt een gelijknamig SoundFont-bestand geladen. Gebruik bijvoorbeeld [VGMTrans](https://github.com/vgmtrans/vgmtrans/) om midibestanden te extraheren.</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="445"/>
+        <location filename="../app/mainwindow.cpp" line="482"/>
         <source>To be clear, this player is (currently) not intended to support all features in a MIDI or SoundFont file. If you want a more advanced MIDI player, consider try [QMidiPlayer](https://chrisoft.org/QMidiPlayer/) instead.</source>
         <translation>Let op: deze speler is (momenteel) niet geschikt voor uitgebreide midi- of SoundFont-bestanden. Als je een uitgebreidere speler wilt, kijk dan eens naar [QMidiPlayer](https://chrisoft.org/QMidiPlayer/).</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="486"/>
-        <location filename="../app/mainwindow.cpp" line="490"/>
+        <location filename="../app/mainwindow.cpp" line="523"/>
+        <location filename="../app/mainwindow.cpp" line="527"/>
         <source>License</source>
         <translation>Licentie</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="498"/>
+        <location filename="../app/mainwindow.cpp" line="535"/>
         <source>Based on the following free software libraries:</source>
         <translation>Gebaseerd op deze vrijesoftwarebibliotheken:</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="580"/>
+        <location filename="../app/mainwindow.cpp" line="619"/>
         <source>Render to...</source>
         <translation>Renderen naar…</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="549"/>
+        <location filename="../app/mainwindow.cpp" line="588"/>
         <source>Feature not available</source>
         <translation>Functie niet beschikbaar</translation>
     </message>
     <message>
-        <location filename="../app/mainwindow.cpp" line="550"/>
+        <location filename="../app/mainwindow.cpp" line="589"/>
         <source>Consider build against &lt;a href=&apos;https://invent.kde.org/frameworks/kio&apos;&gt;KIO&lt;/a&gt; to use this feature.</source>
         <translation>Overweeg om het programma met &lt;a href=&apos;https://invent.kde.org/frameworks/kio&apos;&gt;KIO&lt;/a&gt;-ondersteuning te bouwen.</translation>
     </message>
