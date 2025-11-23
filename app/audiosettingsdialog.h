@@ -18,6 +18,8 @@ public:
 private slots:
     void applySettings();
 
+    void on_refreshDevicesButton_clicked();
+
 private:
     void populateDevices();
     void populateSampleRates();

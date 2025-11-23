@@ -35,9 +35,17 @@ public:
         bool isDefaultOutput = false;
     };
 
+    enum class StreamState {
+        Ok,
+        DeviceNotFound,
+        FormatNotSupported,
+        StreamOpenFailed,
+        UnknownError
+    };
+
     virtual ~AbstractPlayer();
 
-    void play();
+    StreamState play();
     void pause();
     void stop();
     bool isPlaying() const;
@@ -47,19 +55,24 @@ public:
 
     AudioSettings currentAudioSettings() const;
     std::vector<DeviceInfo> enumerateOutputDevices() const;
-    bool applyAudioSettings(const AudioSettings &settings);
+    StreamState applyAudioSettings(const AudioSettings &settings);
+    StreamState getStreamState() const;
+    void refreshDeviceList();
 
     void onIsPlayingChanged(std::function<void(bool)> cb);
+    void onStreamStateChanged(std::function<void(StreamState)> cb);
 
 protected:
     AbstractPlayer();
+
+    void setStreamState(StreamState state);
 
     // Pure virtual functions to be implemented by derived classes
     virtual void renderAudio(float *buffer, unsigned long numFrames) = 0;
     virtual void onStop() = 0;
     virtual void onSeek(unsigned int ms) = 0;
 
-    bool setupAndStartStream();
+    StreamState setupAndStartStream();
     int streamCallback(const void *inputBuffer, void *outputBuffer, unsigned long numFrames);
 
     float m_volume = 1.0f;
@@ -68,6 +81,8 @@ protected:
 
     PaStream *m_stream = nullptr;
     AudioSettings m_audioSettings;
+    StreamState m_lastStreamState = StreamState::Ok;
 
     std::function<void(bool)> mf_onIsPlayingChanged;
+    std::function<void(StreamState)> mf_onStreamStateChanged;
 };

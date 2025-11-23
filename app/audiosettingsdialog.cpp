@@ -76,7 +76,7 @@ void AudioSettingsDialog::applySettings()
     s.framesPerBuffer = (unsigned long)ui->bufferSizeCombo->currentData().toInt();
     s.suggestedLatency = 0.0;
 
-    if (m_player->applyAudioSettings(s)) {
+    if (m_player->applyAudioSettings(s) == AbstractPlayer::StreamState::Ok) {
         Settings::instance()->setAudioDeviceIndex(s.deviceIndex);
         Settings::instance()->setAudioSampleRate(s.sampleRate);
         Settings::instance()->setAudioFramesPerBuffer((int)s.framesPerBuffer);
@@ -85,3 +85,10 @@ void AudioSettingsDialog::applySettings()
         reject();
     }
 }
+
+void AudioSettingsDialog::on_refreshDevicesButton_clicked()
+{
+    m_player->refreshDeviceList();
+    populateDevices();
+}
+

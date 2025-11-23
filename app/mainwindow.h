@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "abstractplayer.h"
+
 #include <QMainWindow>
 #include <QStringListModel>
 
@@ -36,6 +38,7 @@ signals:
 
 private slots:
     void loadSpecificSoundFontActionTriggered();
+    void onPlaybackStreamStateChanged(AbstractPlayer::StreamState state);
 
     void on_playBtn_clicked();
     void on_stopBtn_clicked();
@@ -76,6 +79,7 @@ private:
     QMenu *m_themes;
     PlaylistManager *m_playlistManager;
     QTimer *m_playbackUiTimer = nullptr;
+    bool m_isInAudioSettings = false;
 
     Ui::MainWindow *ui;
 };

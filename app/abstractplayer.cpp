@@ -13,7 +13,7 @@ AbstractPlayer::AbstractPlayer()
     if (initErr != paNoError) {
         fprintf(stderr, "Pa_Initialize failed: %s\n", Pa_GetErrorText(initErr));
     }
-    if (!setupAndStartStream()) {
+    if (setupAndStartStream() != StreamState::Ok) {
         fputs("Failed to open/start audio stream.\n", stderr);
     }
 }
@@ -35,12 +35,13 @@ AbstractPlayer::~AbstractPlayer()
     Pa_Terminate();
 }
 
-void AbstractPlayer::play()
+AbstractPlayer::StreamState AbstractPlayer::play()
 {
     if (!m_stream) {
-        if (!setupAndStartStream()) {
+        StreamState state = setupAndStartStream();
+        if (state != StreamState::Ok) {
             fputs("Not able to create playback stream\n", stderr);
-            return;
+            return state;
         }
     } else {
         PaError active = Pa_IsStreamActive(m_stream);
@@ -49,22 +50,27 @@ void AbstractPlayer::play()
             PaError err = Pa_StartStream(m_stream);
             if (err != paNoError) {
                 fprintf(stderr, "Pa_StartStream failed: %s, reopening...\n", Pa_GetErrorText(err));
-                if (!setupAndStartStream()) {
+                StreamState state = setupAndStartStream();
+                if (state != StreamState::Ok) {
                     fputs("Not able to restart playback stream\n", stderr);
-                    return;
+                    return state;
                 }
             }
         } else if (active < 0) {
-            fprintf(stderr, "Pa_IsStreamActive error: %s, reopening...\n", Pa_GetErrorText(active));
-            if (!setupAndStartStream()) {
+            fprintf(stderr, "Pa_IsStreamActive error: %s, reopening...\n",
+                Pa_GetErrorText(active));
+            StreamState state = setupAndStartStream();
+            if (state != StreamState::Ok) {
                 fputs("Not able to restart playback stream\n", stderr);
-                return;
+                return state;
             }
         }
     }
     m_isPlaying.store(true);
     if (mf_onIsPlayingChanged)
         mf_onIsPlayingChanged(m_isPlaying);
+    
+    return StreamState::Ok;
 }
 
 void AbstractPlayer::pause()
@@ -133,18 +139,43 @@ std::vector<AbstractPlayer::DeviceInfo> AbstractPlayer::enumerateOutputDevices()
     return list;
 }
 
-bool AbstractPlayer::applyAudioSettings(const AudioSettings &settings)
+AbstractPlayer::StreamState AbstractPlayer::applyAudioSettings(const AudioSettings &settings)
 {
     fprintf(stderr, "Apply audio settings: device=%d, sr=%d, ch=%d, fpb=%lu\n",
             settings.deviceIndex, settings.sampleRate, settings.channels, settings.framesPerBuffer);
     bool wasPlaying = m_isPlaying.load();
     m_audioSettings = settings;
-    if (!setupAndStartStream()) {
+    StreamState state = setupAndStartStream();
+    if (state != StreamState::Ok) {
         fprintf(stderr, "Apply audio settings failed, stream rebuild failed.\n");
-        return false;
+        return state;
     }
     m_isPlaying.store(wasPlaying);
-    return true;
+    return StreamState::Ok;
+}
+
+AbstractPlayer::StreamState AbstractPlayer::getStreamState() const
+{
+    return m_lastStreamState;
+}
+
+void AbstractPlayer::refreshDeviceList()
+{
+    if (m_stream) {
+        Pa_StopStream(m_stream);
+        Pa_CloseStream(m_stream);
+        m_stream = nullptr;
+    }
+    
+    if (m_isPlaying.load()) {
+        stop();
+    }
+
+    Pa_Terminate();
+    PaError err = Pa_Initialize();
+    if (err != paNoError) {
+        fprintf(stderr, "Pa_Initialize failed during refresh: %s\n", Pa_GetErrorText(err));
+    }
 }
 
 void AbstractPlayer::onIsPlayingChanged(std::function<void(bool)> cb)
@@ -152,7 +183,25 @@ void AbstractPlayer::onIsPlayingChanged(std::function<void(bool)> cb)
     mf_onIsPlayingChanged = cb;
 }
 
-bool AbstractPlayer::setupAndStartStream()
+void AbstractPlayer::onStreamStateChanged(std::function<void(StreamState)> cb)
+{
+    mf_onStreamStateChanged = cb;
+    if (mf_onStreamStateChanged) {
+        mf_onStreamStateChanged(m_lastStreamState);
+    }
+}
+
+void AbstractPlayer::setStreamState(StreamState state)
+{
+    if (m_lastStreamState != state) {
+        m_lastStreamState = state;
+        if (mf_onStreamStateChanged) {
+            mf_onStreamStateChanged(state);
+        }
+    }
+}
+
+AbstractPlayer::StreamState AbstractPlayer::setupAndStartStream()
 {
     if (m_stream) {
         Pa_StopStream(m_stream);
@@ -166,7 +215,8 @@ bool AbstractPlayer::setupAndStartStream()
     const PaDeviceInfo *devInfo = Pa_GetDeviceInfo(outParams.device);
     if (!devInfo) {
         fprintf(stderr, "Invalid output device index: %d\n", outParams.device);
-        return false;
+        setStreamState(StreamState::DeviceNotFound);
+        return StreamState::DeviceNotFound;
     }
     outParams.channelCount = m_audioSettings.channels;
     outParams.sampleFormat = paFloat32;
@@ -181,7 +231,8 @@ bool AbstractPlayer::setupAndStartStream()
     if (err != paFormatIsSupported) {
         fprintf(stderr, "Format not supported: device=%d (%s), ch=%d, sr=%.2f\n", outParams.device,
                 devInfo->name ? devInfo->name : "?", outParams.channelCount, sr);
-        return false;
+        setStreamState(StreamState::FormatNotSupported);
+        return StreamState::FormatNotSupported;
     }
 
     fprintf(stderr, "Opening stream: device=%d (%s), host=%s, ch=%d, sr=%.2f, fpb=%lu\n",
@@ -206,7 +257,12 @@ bool AbstractPlayer::setupAndStartStream()
     if (err != paNoError) {
         fprintf(stderr, "Pa_OpenStream failed: %s\n", Pa_GetErrorText(err));
         m_stream = nullptr;
-        return false;
+        if (err == paInvalidDevice) {
+            setStreamState(StreamState::DeviceNotFound);
+            return StreamState::DeviceNotFound;
+        }
+        setStreamState(StreamState::StreamOpenFailed);
+        return StreamState::StreamOpenFailed;
     }
 
     // sync chosen sr back to settings
@@ -217,10 +273,12 @@ bool AbstractPlayer::setupAndStartStream()
         fprintf(stderr, "Pa_StartStream failed: %s\n", Pa_GetErrorText(err));
         Pa_CloseStream(m_stream);
         m_stream = nullptr;
-        return false;
+        setStreamState(StreamState::StreamOpenFailed);
+        return StreamState::StreamOpenFailed;
     }
     fprintf(stderr, "Stream started successfully.\n");
-    return true;
+    setStreamState(StreamState::Ok);
+    return StreamState::Ok;
 }
 
 int AbstractPlayer::streamCallback(const void *inputBuffer, void *outputBuffer,

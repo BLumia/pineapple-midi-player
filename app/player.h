@@ -33,7 +33,7 @@ public:
     std::map<enum InfoType, std::variant<int, unsigned int> > midiInfo() const;
     const pmidi::MetaBundle& midiMeta() const;
     unsigned int currentPlaybackPositionMs() const;
-    bool applyAudioSettings(const AudioSettings &settings);
+    StreamState applyAudioSettings(const AudioSettings &settings);
 
     bool loadMidiFile(const char * filePath);
     bool loadSF2File(const char * sf2Path);

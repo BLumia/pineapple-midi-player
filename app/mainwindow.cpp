@@ -63,6 +63,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionFallbackSoundFont, &QAction::triggered, this, &MainWindow::loadSpecificSoundFontActionTriggered);
 
+    Player::instance()->onStreamStateChanged([this](AbstractPlayer::StreamState state) {
+        onPlaybackStreamStateChanged(state);
+    });
+
     {
         Player::AudioSettings s;
         s.deviceIndex = Settings::instance()->audioDeviceIndex();
@@ -240,7 +244,10 @@ bool MainWindow::checkCanPlay(bool suppressWarningDlg)
 void MainWindow::tryPlay(bool suppressWarningDlg)
 {
     if (checkCanPlay(suppressWarningDlg)) {
-        Player::instance()->play();
+        AbstractPlayer::StreamState result = Player::instance()->play();
+        if (result != AbstractPlayer::StreamState::Ok && !suppressWarningDlg) {
+            onPlaybackStreamStateChanged(result);
+        }
     }
 }
 
@@ -263,6 +270,36 @@ void MainWindow::loadSpecificSoundFontActionTriggered()
     loadSoundFontFile(action->data().toString());
     if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier)) {
         Settings::instance()->setFallbackSoundFont(action->data().toString());
+    }
+}
+
+void MainWindow::onPlaybackStreamStateChanged(AbstractPlayer::StreamState state)
+{
+    if (state != AbstractPlayer::StreamState::Ok) {
+        QMetaObject::invokeMethod(this, [this]() {
+            if (!m_isInAudioSettings) {
+                QMessageBox msgBox(this);
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setWindowTitle(tr("Playback Stream Initialization Error"));
+                msgBox.setText(tr("Playback stream failed to initialize. This might be caused by the configured audio output device is no longer available, or a invalid audio output configuration."));
+                msgBox.setInformativeText(tr("Do you want to reset to use the default output device or open the settings dialog?"));
+
+                QPushButton *useDefaultBtn = msgBox.addButton(tr("Reset Audio Output Device to Default"), QMessageBox::ActionRole);
+                QPushButton *openSettingsBtn = msgBox.addButton(tr("Open Audio Settings"), QMessageBox::ActionRole);
+                msgBox.addButton(QMessageBox::Cancel);
+
+                msgBox.exec();
+
+                if (msgBox.clickedButton() == useDefaultBtn) {
+                    Player::AudioSettings def;
+                    def.deviceIndex = -1;
+                    Player::instance()->applyAudioSettings(def);
+                    Settings::instance()->setAudioDeviceIndex(-1);
+                } else if (msgBox.clickedButton() == openSettingsBtn) {
+                    QTimer::singleShot(0, this, &MainWindow::on_actionAudioSettings_triggered);
+                }
+            }
+        }, Qt::QueuedConnection);
     }
 }
 
@@ -522,8 +559,10 @@ SOFTWARE.
 
 void MainWindow::on_actionAudioSettings_triggered()
 {
+    m_isInAudioSettings = true;
     AudioSettingsDialog dlg(Player::instance(), this);
     dlg.exec();
+    m_isInAudioSettings = false;
 }
 
 void MainWindow::on_actionRepeat_triggered()

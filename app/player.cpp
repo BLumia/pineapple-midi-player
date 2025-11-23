@@ -329,10 +329,9 @@ void Player::renderAudio(float *buffer, unsigned long numFrames)
     m_uiPlaybackMs.store((unsigned int)m_currentPlaybackMSec);
 }
 
-bool Player::applyAudioSettings(const AudioSettings &settings)
-{
-    bool result = AbstractPlayer::applyAudioSettings(settings);
-    if (result && m_tinySoundFont) {
+AbstractPlayer::StreamState Player::applyAudioSettings(const AudioSettings &settings) {
+    StreamState result = AbstractPlayer::applyAudioSettings(settings);
+    if (result == StreamState::Ok && m_tinySoundFont) {
         int sr = (m_audioSettings.sampleRate > 0) ? m_audioSettings.sampleRate : SAMPLE_RATE;
         tsf_set_output(m_tinySoundFont, TSF_STEREO_INTERLEAVED, sr, 0.0f);
         fprintf(stderr, "TSF output reconfigured to sr=%d\n", sr);
