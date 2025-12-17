@@ -6,7 +6,7 @@
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="14"/>
         <source>Audio Settings</source>
-        <translation>Geluidsinstellingen</translation>
+        <translation>Audio-instellingen</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="22"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="39"/>
         <source>Buffer Size</source>
-        <translation>Buffergrootte</translation>
+        <translation>Bufferomvang</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="61"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Herladen</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.cpp" line="29"/>
@@ -156,7 +156,7 @@
     <message>
         <location filename="../app/mainwindow.ui" line="339"/>
         <source>Audio Settings...</source>
-        <translation>Geluidsinstellingen…</translation>
+        <translation>Audio-instellingen…</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.ui" line="347"/>
@@ -222,27 +222,27 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="283"/>
         <source>Playback Stream Initialization Error</source>
-        <translation type="unfinished"></translation>
+        <translation>De stream kan niet worden ingelezen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="284"/>
         <source>Playback stream failed to initialize. This might be caused by the configured audio output device is no longer available, or a invalid audio output configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit kan worden veroorzaakt doordat het gekozen audioapparaat niet meer beschikbaar is of omdat er een verkeerd apparaat is gekozen.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="285"/>
         <source>Do you want to reset to use the default output device or open the settings dialog?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wil je het opnieuw proberen aan de hand van het standaardapparaat of de instellingen openen?</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="287"/>
         <source>Reset Audio Output Device to Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaardapparaat gebruiken</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="288"/>
         <source>Open Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Instellingen openen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="459"/>
