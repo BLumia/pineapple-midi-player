@@ -26,7 +26,7 @@
     <message>
         <location filename="../app/audiosettingsdialog.ui" line="61"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Auffrischen</translation>
     </message>
     <message>
         <location filename="../app/audiosettingsdialog.cpp" line="29"/>
@@ -222,27 +222,27 @@
     <message>
         <location filename="../app/mainwindow.cpp" line="283"/>
         <source>Playback Stream Initialization Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler bei der Initialisierung des Wiedergabestreams</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="284"/>
         <source>Playback stream failed to initialize. This might be caused by the configured audio output device is no longer available, or a invalid audio output configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Initialisierung des Wiedergabestreams ist fehlgeschlagen. Dies kann daran liegen, dass das konfigurierte Audioausgabegerät nicht mehr verfügbar ist oder dass die Audioausgabekonfiguration ungültig ist.</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="285"/>
         <source>Do you want to reset to use the default output device or open the settings dialog?</source>
-        <translation type="unfinished"></translation>
+        <translation>Möchtest du auf das Standardausgabegerät zurücksetzen oder den Einstellungsdialog öffnen?</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="287"/>
         <source>Reset Audio Output Device to Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Audioausgabegerät auf Standard zurücksetzen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="288"/>
         <source>Open Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Audioeinstellungen öffnen</translation>
     </message>
     <message>
         <location filename="../app/mainwindow.cpp" line="459"/>
