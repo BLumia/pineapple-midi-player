@@ -13,7 +13,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build Project
         run: |
-          qt-cmake -Bbuild -DCMAKE_BUILD_TYPE=MinSizeRel .
+          qt-cmake -Bbuild -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded .
           cmake --build build -j --config Release
           cmake --install build --config Release --prefix "install"
       - name: Upload
