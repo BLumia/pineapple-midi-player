@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v6
-      - uses: AllanChain/install-qt-static@v6.10.1
+      - uses: AllanChain/install-qt-static@v6.11.0
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build Project
         run: |
@@ -17,7 +17,7 @@ jobs:
           cmake --build build -j --config Release
           cmake --install build --config Release --prefix "install"
       - name: Upload
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: pmidi-win-static-build
           path: "install/bin/"

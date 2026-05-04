@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Install build dept.
@@ -36,7 +36,7 @@ jobs:
         run: |
           ./linuxdeploy-x86_64.AppImage --appdir AppDir -e build/pmidi -d dist/net.blumia.pineapple-midi-player.desktop -i assets/icons/app-icon.svg --icon-filename net.blumia.pineapple-midi-player -p qt -o appimage
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Linux-Build
           path: "Pineapple*.AppImage"
