@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Gary Wang <git@blumia.net>
+// SPDX-FileCopyrightText: 2026 Gary Wang <git@blumia.net>
 //
 // SPDX-License-Identifier: MIT
 
@@ -494,7 +494,7 @@ void MainWindow::on_actionAbout_triggered()
 {
     const QString mitLicense(QStringLiteral(R"(Expat/MIT License
 
-Copyright &copy; 2025 BLumia
+Copyright &copy; 2026 BLumia
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -551,7 +551,7 @@ SOFTWARE.
         "\n"
         "[Source Code](https://github.com/BLumia/pineapple-midi-player)\n"
         "\n"
-        "Copyright &copy; 2025 [BLumia](https://github.com/BLumia/)"
+        "Copyright &copy; 2026 [BLumia](https://github.com/BLumia/)"
     );
     infoBox.setTextFormat(Qt::MarkdownText);
     infoBox.exec();

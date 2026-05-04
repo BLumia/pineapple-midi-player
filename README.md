@@ -80,6 +80,6 @@ Beside feedback and code contribution, other contributions are also welcome!
 
 ## License
 
-Copyright &copy; 2025 [Gary Wang](https://github.com/BLumia/)
+Copyright &copy; 2026 [Gary Wang](https://github.com/BLumia/)
 
 Available under Expat/MIT License
